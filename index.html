@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CiberJuegos · Aprende ciberseguridad jugando</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03060d;--panel:#0a1422;--line:#1a2c46;
+  --txt:#e8eef8;--muted:#8ba0be;
+  --green:#34d399;--red:#f87171;--cyan:#22d3ee;--violet:#a78bfa;--amber:#fbbf24;--pink:#f472b6;
+}
+html,body{overflow-x:hidden}
+body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:40px;position:relative}
+.cyber-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.cyber-bg .base{position:absolute;inset:0;background:radial-gradient(1200px 700px at 15% -10%,#0a2540 0%,transparent 55%),radial-gradient(1000px 600px at 100% 5%,#1a0e3a 0%,transparent 55%),linear-gradient(180deg,#03060d 0%,#050b18 50%,#03060d 100%)}
+.cyber-bg .grid{position:absolute;left:-10%;right:-10%;bottom:-5%;height:60%;background-image:linear-gradient(to right,rgba(34,211,238,.13) 1px,transparent 1px),linear-gradient(to bottom,rgba(34,211,238,.13) 1px,transparent 1px);background-size:60px 60px;transform:perspective(400px) rotateX(60deg);transform-origin:center bottom;mask-image:linear-gradient(to top,#000 0%,transparent 90%);-webkit-mask-image:linear-gradient(to top,#000 0%,transparent 90%);animation:gridScroll 14s linear infinite}
+@keyframes gridScroll{from{background-position:0 0}to{background-position:0 60px}}
+.cyber-bg #matrix{position:absolute;inset:0;width:100%;height:100%;opacity:.22;mix-blend-mode:screen}
+#stage{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 18px}
+.hud{position:sticky;top:0;z-index:50;background:rgba(3,6,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 14px}
+.hud-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(10,20,34,.85);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.8rem}
+.chip .lbl{color:var(--muted);font-weight:800;font-size:.6rem;letter-spacing:1.3px}
+.chip .val{font-weight:900;font-variant-numeric:tabular-nums;font-size:.95rem}
+.val.pos{color:var(--green)}.val.neg{color:var(--red)}
+.dots{display:flex;gap:5px}
+.dot{width:11px;height:11px;border-radius:50%;background:#22314a;border:1px solid #2c3f5c;transition:.35s}
+.dot.on{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px -2px var(--cyan)}
+.dot.done{background:var(--green);border-color:var(--green)}
+.panel{background:linear-gradient(165deg,rgba(16,26,44,.94),rgba(8,16,28,.94));border:1px solid var(--line);border-radius:22px;padding:26px 24px;box-shadow:0 24px 60px -30px #000;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.title{font-size:clamp(1.4rem,4vw,2rem);letter-spacing:-.5px;text-align:center;margin-bottom:12px;font-weight:900}
+.title span{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{color:var(--muted);text-align:center;line-height:1.7;font-size:.92rem;max-width:640px;margin:0 auto 22px}
+.rules{display:grid;gap:10px;margin:20px 0}
+.rule{display:flex;gap:12px;align-items:flex-start;background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.85rem;line-height:1.55;color:#cdd9ea}
+.rule .num{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem;background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
+.rule:nth-child(1) .num{background:rgba(52,211,153,.12);color:var(--green);border-color:rgba(52,211,153,.3)}
+.rule:nth-child(3) .num{background:rgba(167,139,250,.12);color:var(--violet);border-color:rgba(167,139,250,.3)}
+.rule:nth-child(4) .num{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.3)}
+.rule:nth-child(5) .num{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.3)}
+.rule:nth-child(6) .num{background:rgba(34,211,238,.12);color:var(--cyan);border-color:rgba(34,211,238,.3)}
+.maxscore{background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:22px 0}
+.maxscore-title{font-size:.7rem;font-weight:900;letter-spacing:1.8px;color:var(--amber);text-align:center;margin-bottom:12px}
+.maxscore-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:.85rem;border-bottom:1px dashed rgba(255,255,255,.07)}
+.maxscore-row:last-of-type{border-bottom:none}
+.maxscore-row .ms-left{display:flex;align-items:center;gap:8px;color:#cdd9ea}
+.maxscore-row .ms-right{font-weight:900;color:var(--green);font-variant-numeric:tabular-nums}
+.maxscore-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:1rem;font-weight:900}
+.maxscore-total .ms-left{color:var(--txt)}
+.maxscore-total .ms-right{color:var(--amber);font-variant-numeric:tabular-nums}
+.temas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:22px 0}
+.tema-card{background:linear-gradient(160deg,rgba(19,31,51,.9),rgba(11,20,32,.9));border:1px solid var(--line);border-radius:18px;padding:18px 16px;cursor:pointer;transition:.25s;text-align:left;font-family:inherit;color:var(--txt);display:flex;flex-direction:column;gap:10px}
+.tema-card:hover{transform:translateY(-5px);border-color:var(--tc,var(--cyan))}
+.tema-card.done{border-color:rgba(52,211,153,.5);background:linear-gradient(160deg,rgba(14,38,32,.85),rgba(10,26,24,.85))}
+.tema-head{display:flex;align-items:center;gap:12px}
+.tema-ico-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid var(--tc,rgba(34,211,238,.4))}
+.tema-card .tema-name{font-size:1.05rem;font-weight:900;color:var(--tc,var(--cyan))}
+.tema-card .tema-desc{font-size:.78rem;line-height:1.5;color:var(--muted)}
+.tema-card .tema-max{font-size:.72rem;color:var(--amber);font-weight:800}
+.tema-card .tag{font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid;align-self:flex-start}
+.tag-done{color:var(--green);border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.14)}
+.btn{display:block;width:100%;font-family:inherit;font-size:.95rem;font-weight:800;padding:15px 20px;border-radius:14px;cursor:pointer;border:1px solid;transition:.2s;letter-spacing:.3px}
+.btn-primary{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(167,139,250,.22));border-color:rgba(34,211,238,.55);color:#c8ecf7}
+.btn-primary:hover{background:linear-gradient(135deg,rgba(34,211,238,.36),rgba(167,139,250,.36));transform:translateY(-2px)}
+.btn-secondary{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted);margin-top:10px;font-size:.85rem;padding:12px 18px}
+.btn-secondary:hover{background:rgba(255,255,255,.07);color:var(--txt)}
+.btn-finish{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.5);color:var(--amber);margin-top:14px}
+.btn-finish:hover{background:rgba(251,191,36,.24);transform:translateY(-2px)}
+.btn-final{background:linear-gradient(135deg,rgba(52,211,153,.25),rgba(34,211,238,.25));border-color:rgba(52,211,153,.6);color:#c8ecf7;margin-top:14px;box-shadow:0 0 30px -10px rgba(52,211,153,.6)}
+.btn-final:hover{background:linear-gradient(135deg,rgba(52,211,153,.4),rgba(34,211,238,.4));transform:translateY(-2px)}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.game-title{font-size:1.05rem;font-weight:900;color:var(--tc,var(--cyan))}
+.game-info{display:flex;gap:8px;flex-wrap:wrap}
+.badge{background:rgba(10,20,34,.85);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.72rem;font-weight:800;color:var(--muted)}
+.badge b{color:var(--txt)}
+.task-banner{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);border-radius:13px;padding:12px 16px;font-size:.85rem;color:#c3d2e6;line-height:1.6;margin-bottom:18px;text-align:center}
+.task-banner b{color:var(--cyan)}
+.clicker-grid{display:grid;gap:12px;margin-bottom:6px}
+.clicker-grid.cols-2{grid-template-columns:1fr 1fr}
+.clicker-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.clicker-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:680px){.clicker-grid.cols-2,.clicker-grid.cols-3,.clicker-grid.cols-4{grid-template-columns:1fr}}
+.click-item{position:relative;background:rgba(10,20,34,.85);border:2px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;transition:.2s;font-family:inherit;color:var(--txt);text-align:left;display:flex;flex-direction:column;gap:6px;min-height:70px}
+.click-item:hover{border-color:#3b4d6a;transform:translateY(-2px)}
+.click-item.marked{border-color:var(--cyan);background:linear-gradient(160deg,rgba(34,211,238,.15),rgba(34,211,238,.05))}
+.click-item.locked{cursor:default;pointer-events:none}
+
+.email-inbox{background:linear-gradient(180deg,rgba(3,6,13,.6),rgba(3,6,13,.4));border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:6px;box-shadow:0 8px 30px -20px #000 inset}
+.email-inbox-bar{background:linear-gradient(180deg,rgba(30,45,70,.7),rgba(15,25,42,.7));border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.email-inbox-title{font-size:.9rem;font-weight:900;color:var(--cyan);display:flex;align-items:center;gap:8px}
+.email-inbox-count{font-size:.68rem;color:var(--muted);font-weight:800;padding:4px 11px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);border-radius:999px;font-variant-numeric:tabular-nums}
+.email-list{display:flex;flex-direction:column}
+.email-card{position:relative;padding:16px 20px;border-bottom:1px solid rgba(26,44,70,.6);cursor:pointer;transition:all .22s;background:transparent;font-family:inherit;color:var(--txt);text-align:left;width:100%;border-left:3px solid transparent;border-right:none;border-top:none}
+.email-card:last-child{border-bottom:none}
+.email-card:hover{background:rgba(34,211,238,.05);border-left-color:rgba(34,211,238,.6)}
+.email-card.marked{background:rgba(248,113,113,.09);border-left-color:var(--red)}
+.email-card.locked{cursor:default;pointer-events:none}
+.email-card.marked::after{content:'🚨';position:absolute;top:14px;right:14px;font-size:1.5rem;animation:dangerPulse 1.1s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(248,113,113,.8))}
+@keyframes dangerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.email-header{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.email-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem;flex-shrink:0;color:var(--cyan);border:1px solid rgba(34,211,238,.35);background:linear-gradient(135deg,#1a2d45,#0d1826);font-family:'Courier New',monospace;text-transform:uppercase}
+.email-card.marked .email-avatar{background:linear-gradient(135deg,#3a1a20,#2a0e14);border-color:rgba(248,113,113,.55);color:var(--red)}
+.email-info{flex:1;min-width:0}
+.email-sender-name{font-weight:900;font-size:.88rem;color:var(--txt);margin-bottom:2px}
+.email-card.marked .email-sender-name{color:#fca5a5}
+.email-sender-addr{font-family:'Courier New',monospace;font-size:.72rem;color:var(--cyan);word-break:break-all;font-weight:700}
+.email-card.marked .email-sender-addr{color:#fca5a5}
+.email-meta{flex-shrink:0;text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.email-time{font-size:.68rem;color:var(--muted);font-weight:700}
+.email-badge{font-size:.6rem;font-weight:900;padding:2px 8px;border-radius:4px;font-family:'Courier New',monospace}
+.email-badge.priority{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.4)}
+.email-badge.attach{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.35)}
+.email-subject-line{display:flex;gap:8px;align-items:center;margin-bottom:6px;padding-left:54px}
+.email-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0}
+.email-card.marked .email-unread-dot{background:var(--red)}
+.email-subject{font-weight:800;font-size:.93rem;color:var(--txt);flex:1}
+.email-card.marked .email-subject{color:#fca5a5}
+.email-body{font-size:.82rem;color:var(--muted);line-height:1.55;padding-left:54px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+.file-explorer{background:linear-gradient(180deg,rgba(3,6,13,.6),rgba(3,6,13,.4));border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:6px;box-shadow:0 8px 30px -20px #000 inset}
+.file-explorer-bar{background:linear-gradient(180deg,rgba(30,45,70,.7),rgba(15,25,42,.7));border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:.72rem}
+.fe-dots{display:flex;gap:5px;flex-shrink:0}
+.fe-dots span{width:10px;height:10px;border-radius:50%}
+.fe-dots span:nth-child(1){background:#f87171}
+.fe-dots span:nth-child(2){background:#fbbf24}
+.fe-dots span:nth-child(3){background:#34d399}
+.fe-path{flex:1;font-family:'Courier New',monospace;color:#8ba0be;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fe-count{color:var(--cyan);font-weight:900;font-family:'Courier New',monospace;font-size:.72rem}
+.fe-legend{background:rgba(3,6,13,.6);border-bottom:1px solid var(--line);padding:8px 14px;display:flex;flex-wrap:wrap;gap:12px;font-size:.62rem;color:var(--muted)}
+.fe-legend-item{display:flex;align-items:center;gap:5px}
+.fe-legend-badge{padding:1px 7px;border-radius:999px;background:rgba(139,160,190,.15);border:1px solid rgba(139,160,190,.3);color:#cdd9ea;font-family:'Courier New',monospace;font-weight:900;font-size:.55rem}
+.file-explorer .clicker-grid{padding:16px}
+.file-item{padding:16px 10px;min-height:160px;background:linear-gradient(160deg,#16233a,#0b1420);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;transition:.25s;position:relative;border:2px solid var(--line);border-radius:14px;cursor:pointer;font-family:inherit;color:var(--txt);text-align:center}
+.file-item:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(34,211,238,.6)}
+.file-icon-wrap{width:60px;height:60px;border-radius:15px;background:linear-gradient(160deg,rgba(34,211,238,.08),rgba(167,139,250,.06));border:1px solid rgba(34,211,238,.2);display:flex;align-items:center;justify-content:center;transition:.25s;flex-shrink:0}
+.file-item:hover .file-icon-wrap{background:linear-gradient(160deg,rgba(34,211,238,.18),rgba(167,139,250,.12));transform:scale(1.08)}
+.file-icon{font-size:1.9rem;line-height:1}
+.file-name{font-family:'Courier New',monospace;font-size:.68rem;font-weight:700;color:#cdd9ea;word-break:break-all;line-height:1.3;max-width:100%}
+.file-ext-badge{font-size:.58rem;font-weight:900;padding:3px 10px;border-radius:999px;background:rgba(139,160,190,.15);color:#cdd9ea;border:1px solid rgba(139,160,190,.3);font-family:'Courier New',monospace}
+.click-item.file-item.marked{border-color:var(--red);background:linear-gradient(160deg,rgba(248,113,113,.15),rgba(248,113,113,.03))}
+.click-item.file-item.marked::after{content:'🦠';position:absolute;top:8px;right:10px;font-size:1.5rem;animation:dangerPulse 1s infinite;filter:drop-shadow(0 0 10px rgba(248,113,113,.9))}
+.click-item.file-item.marked .file-name{color:#fca5a5}
+.click-item.file-item.marked .file-ext-badge{background:rgba(248,113,113,.2);color:#fca5a5;border-color:rgba(248,113,113,.4)}
+
+/* PASSWORD CREATOR */
+.pwd-create-wrap{display:flex;flex-direction:column;gap:16px}
+.pwd-privacy-banner{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));border:1px solid rgba(251,191,36,.45);border-radius:14px;padding:14px 16px;font-size:.83rem;line-height:1.65;color:#fde68a}
+.pwd-privacy-banner b{color:var(--amber)}
+.pwd-privacy-banner .lock{font-size:1.2rem;margin-right:4px}
+.pwd-input-wrap{position:relative}
+.pwd-input{width:100%;font-family:'Courier New',monospace;font-size:1.1rem;font-weight:700;color:var(--cyan);background:rgba(3,6,13,.85);border:2px solid rgba(34,211,238,.45);border-radius:14px;padding:18px 60px 18px 20px;letter-spacing:1px;transition:.2s}
+.pwd-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
+.pwd-toggle-vis{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:10px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.35);color:var(--cyan);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:inherit}
+.pwd-toggle-vis:hover{background:rgba(34,211,238,.25)}
+.pwd-charcount{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);font-weight:800;margin-top:6px;padding:0 4px}
+.pwd-charcount .cnt{color:var(--cyan);font-variant-numeric:tabular-nums}
+.pwd-analyzing{text-align:center;padding:50px 20px;background:linear-gradient(160deg,rgba(16,26,44,.9),rgba(8,16,28,.9));border:2px solid rgba(34,211,238,.35);border-radius:20px;position:relative;overflow:hidden}
+.pwd-spinner{width:70px;height:70px;border:4px solid rgba(34,211,238,.15);border-top-color:var(--cyan);border-radius:50%;margin:0 auto 20px;animation:pwdSpin 1s linear infinite}
+@keyframes pwdSpin{to{transform:rotate(360deg)}}
+.pwd-analyzing-text{font-size:1.05rem;font-weight:900;color:var(--cyan);margin-bottom:8px}
+.pwd-analyzing-sub{font-size:.82rem;color:var(--muted);font-weight:700}
+.pwd-score-hero{text-align:center;padding:20px 0;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.pwd-score-big{font-size:4rem;font-weight:900;line-height:1;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.pwd-score-max{font-size:1.1rem;color:var(--muted);font-weight:800;margin-top:2px}
+.pwd-level-badge{display:inline-block;margin-top:12px;padding:8px 22px;border-radius:999px;font-size:.9rem;font-weight:900;border:2px solid;letter-spacing:.5px}
+.pwd-meter{margin:16px 0}
+.pwd-meter-label{display:flex;justify-content:space-between;font-size:.75rem;font-weight:900;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.pwd-meter-bar{height:14px;background:#16223a;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.pwd-meter-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1.2)}
+.pwd-cracktime{margin:16px 0;padding:14px 18px;border-radius:13px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);font-size:.9rem;line-height:1.6;color:#c3d2e6;text-align:center}
+.pwd-cracktime b{color:var(--cyan);font-size:1.02rem}
+.pwd-crack-scenarios{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.pwd-crack-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;font-size:.8rem;background:rgba(3,6,13,.6);border:1px solid rgba(26,44,70,.6)}
+.pwd-crack-row .cl{color:var(--muted);font-weight:700}
+.pwd-crack-row .cr{font-weight:900;font-variant-numeric:tabular-nums;color:var(--cyan)}
+.pwd-findings{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.pwd-findings-head{font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--muted);margin-top:12px;margin-bottom:2px}
+.pwd-finding{padding:10px 14px;border-radius:10px;font-size:.84rem;line-height:1.55;display:flex;gap:10px;align-items:flex-start}
+.pwd-finding.ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);color:#c3d2e6}
+.pwd-finding.ko{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);color:#c3d2e6}
+.pwd-finding.tip{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);color:#c3d2e6}
+.pwd-finding .fi{flex-shrink:0;font-size:1.05rem;line-height:1.3}
+.pwd-finding .ft{flex:1}
+.pwd-forgot{text-align:center;font-size:.74rem;color:var(--muted);margin-top:16px;padding:10px;background:rgba(52,211,153,.05);border:1px dashed rgba(52,211,153,.3);border-radius:10px;font-weight:800;letter-spacing:.3px;line-height:1.5}
+.pwd-forgot b{color:var(--green)}
+
+.sc-grid{display:grid;gap:14px}
+.sc-card{position:relative;background:linear-gradient(160deg,rgba(20,28,46,.95),rgba(8,16,28,.95));border:2px solid var(--line);border-radius:18px;padding:16px 18px;cursor:pointer;transition:all .28s;font-family:inherit;color:var(--txt);text-align:left;overflow:hidden}
+.sc-card:hover{transform:translateY(-3px);border-color:var(--sc-color, rgba(244,114,182,.5));box-shadow:0 18px 40px -18px var(--sc-color, rgba(244,114,182,.5))}
+.sc-card.marked{border-color:var(--red);background:linear-gradient(160deg,rgba(248,113,113,.14),rgba(248,113,113,.03));box-shadow:0 0 30px -10px rgba(248,113,113,.7)}
+.sc-card.marked::after{content:'👥';position:absolute;top:12px;right:14px;font-size:1.5rem;animation:dangerPulse 1.1s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(248,113,113,.9));z-index:2}
+.sc-card.locked{cursor:default;pointer-events:none}
+.sc-card.whatsapp{--sc-color:#25d366}
+.sc-card.email{--sc-color:var(--cyan)}
+.sc-card.call{--sc-color:var(--amber)}
+.sc-card.sms{--sc-color:#60a5fa}
+.sc-card.instagram{--sc-color:var(--pink)}
+.sc-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-right:32px;position:relative;z-index:1}
+.sc-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:2px solid var(--sc-color, rgba(244,114,182,.4));background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));transition:.25s;position:relative}
+.sc-avatar::after{content:'';position:absolute;bottom:-1px;right:-1px;width:13px;height:13px;border-radius:50%;background:var(--sc-color, var(--pink));border:2px solid var(--bg)}
+.sc-card:hover .sc-avatar{transform:scale(1.08);box-shadow:0 0 25px -6px var(--sc-color, rgba(244,114,182,.9))}
+.sc-info{flex:1;min-width:0}
+.sc-sender{font-weight:900;font-size:.92rem;color:var(--txt);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-platform{display:inline-flex;align-items:center;gap:5px;font-size:.62rem;color:var(--sc-color, var(--muted));font-weight:900;letter-spacing:1.2px;text-transform:uppercase}
+.sc-platform::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--sc-color, var(--muted))}
+.sc-card.marked .sc-platform{color:#fca5a5}
+.sc-card.marked .sc-platform::before{background:#fca5a5}
+.sc-time{font-size:.68rem;color:var(--muted);font-weight:700;flex-shrink:0}
+.sc-bubble{background:rgba(3,6,13,.62);padding:14px 16px;border-radius:14px 14px 14px 4px;font-size:.88rem;line-height:1.6;color:#cdd9ea;border-left:3px solid var(--sc-color, rgba(244,114,182,.5));position:relative;z-index:1}
+.sc-card.marked .sc-bubble{color:#fca5a5;background:rgba(60,10,20,.4);border-left-color:rgba(248,113,113,.7)}
+
+/* NETWORK GAME */
+.net-game{display:flex;flex-direction:column;gap:16px}
+.net-hero{position:relative;background:linear-gradient(135deg,rgba(30,45,70,.85),rgba(15,25,42,.85));border:1px solid rgba(34,211,238,.3);border-radius:18px;padding:22px 20px;display:flex;align-items:center;gap:18px;overflow:hidden}
+.net-hero-icon{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(167,139,250,.2));border:2px solid rgba(34,211,238,.5);display:flex;align-items:center;justify-content:center;font-size:2.4rem;flex-shrink:0;box-shadow:0 0 30px -8px rgba(34,211,238,.6)}
+.net-hero-text{flex:1;min-width:0}
+.net-hero-level{font-size:.6rem;font-weight:900;letter-spacing:2px;color:var(--amber);margin-bottom:6px;text-transform:uppercase}
+.net-hero-title{font-size:1.15rem;font-weight:900;color:var(--cyan);margin-bottom:8px;line-height:1.25}
+.net-hero-desc{font-size:.85rem;color:#cdd9ea;line-height:1.6}
+.net-hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.net-count-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);color:var(--amber);padding:4px 11px;border-radius:999px;font-size:.7rem;font-weight:900}
+.net-trap-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(248,113,113,.14);border:1px solid rgba(248,113,113,.4);color:var(--red);padding:4px 11px;border-radius:999px;font-size:.7rem;font-weight:900}
+.net-toggles{display:grid;gap:10px}
+.net-toggle{position:relative;display:flex;align-items:flex-start;gap:14px;background:linear-gradient(135deg,rgba(3,6,13,.7),rgba(10,20,34,.7));border:2px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .25s;font-family:inherit;color:var(--txt);text-align:left;width:100%}
+.net-toggle:hover{border-color:rgba(34,211,238,.4);transform:translateY(-1px)}
+.net-toggle.on{border-color:rgba(52,211,153,.55);background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.02))}
+.net-toggle.locked{cursor:default;pointer-events:none}
+.net-toggle.correct-locked{border-color:rgba(52,211,153,.6);background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(52,211,153,.03))}
+.net-toggle.wrong-locked{border-color:rgba(248,113,113,.6);background:linear-gradient(135deg,rgba(248,113,113,.15),rgba(248,113,113,.03))}
+.net-toggle-icon{width:42px;height:42px;border-radius:11px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.25);display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0}
+.net-toggle.on .net-toggle-icon{background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4)}
+.net-toggle-text{flex:1;min-width:0;padding-top:2px}
+.net-toggle-label{font-size:.9rem;font-weight:800;color:var(--txt);margin-bottom:4px;line-height:1.3}
+.net-toggle-sub{font-size:.75rem;color:var(--muted);line-height:1.5}
+.net-toggle.on .net-toggle-label{color:var(--green)}
+.net-toggle-status{flex-shrink:0;font-size:.6rem;font-weight:900;letter-spacing:.8px;padding:4px 9px;border-radius:8px;background:rgba(139,160,190,.15);color:#8ba0be;border:1px solid rgba(139,160,190,.3);margin-top:4px;white-space:nowrap}
+.net-toggle.on .net-toggle-status{background:rgba(52,211,153,.2);color:var(--green);border-color:rgba(52,211,153,.5)}
+.net-toggle-feedback{position:absolute;right:12px;top:14px;font-size:1.5rem;font-weight:900;display:none}
+.net-toggle.correct-locked .net-toggle-feedback{display:block;color:var(--green)}
+.net-toggle.wrong-locked .net-toggle-feedback{display:block;color:var(--red)}
+.net-toggle.correct-locked .net-toggle-status,.net-toggle.wrong-locked .net-toggle-status{display:none}
+.net-meter{margin-top:4px}
+.net-meter-label{display:flex;justify-content:space-between;font-size:.72rem;font-weight:800;color:var(--muted);margin-bottom:6px}
+.net-meter-label b{color:var(--cyan)}
+.net-meter-bar{height:8px;background:#16223a;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.net-meter-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:99px;transition:width .4s ease}
+
+.te-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.te-row{padding:11px 14px;border-radius:11px;font-size:.84rem;line-height:1.55}
+.te-row.good{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.25);color:#c3d2e6}
+.te-row.bad{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3);color:#c3d2e6}
+.te-row.good .te-head{color:var(--green)}
+.te-row.bad .te-head{color:var(--red)}
+.te-head{font-weight:900;margin-bottom:5px;font-size:.86rem}
+.te-body{font-size:.82rem;line-height:1.6;color:#cdd9ea}
+.te-body b{color:var(--txt)}
+
+.quiz-stage{display:flex;flex-direction:column;gap:18px}
+.quiz-topbar{background:linear-gradient(180deg,rgba(30,45,70,.7),rgba(15,25,42,.7));border:1px solid var(--line);border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.quiz-topbar-left{display:flex;align-items:center;gap:10px}
+.quiz-cat-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(167,139,250,.2));border:1px solid rgba(34,211,238,.4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.quiz-cat-name{font-size:.72rem;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:var(--cyan)}
+.quiz-progress-badge{font-size:.72rem;font-weight:900;padding:5px 12px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);border-radius:999px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.quiz-shuffled-badge{font-size:.65rem;font-weight:800;padding:4px 10px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);border-radius:999px;color:var(--amber);display:inline-flex;align-items:center;gap:5px}
+.quiz-progressbar{height:8px;background:#16223a;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.quiz-progressfill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:99px;transition:width .45s cubic-bezier(.2,.9,.3,1.2)}
+.quiz-card{position:relative;background:linear-gradient(160deg,rgba(16,26,44,.95),rgba(8,16,28,.95));border:2px solid var(--line);border-radius:20px;padding:32px 26px;text-align:center;overflow:hidden}
+.quiz-card-icon{font-size:3rem;line-height:1;display:inline-block;margin-bottom:14px;filter:drop-shadow(0 4px 20px rgba(34,211,238,.5))}
+.quiz-card-question{font-size:clamp(1.05rem,2.6vw,1.25rem);font-weight:800;line-height:1.5;color:var(--txt);max-width:600px;margin:0 auto}
+.quiz-options{display:grid;gap:12px}
+.quiz-option{position:relative;padding:18px 20px;border-radius:14px;font-weight:700;font-size:.92rem;cursor:pointer;border:2px solid var(--line);background:linear-gradient(135deg,rgba(10,20,34,.9),rgba(16,26,44,.9));color:var(--txt);font-family:inherit;transition:all .25s;text-align:left;line-height:1.45;display:flex;gap:14px;align-items:center}
+.quiz-option .qo-letter{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,rgba(34,211,238,.15),rgba(167,139,250,.15));color:var(--cyan);display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;font-size:1.1rem;border:1px solid rgba(34,211,238,.35);font-family:'Courier New',monospace}
+.quiz-option:hover{border-color:rgba(34,211,238,.6);transform:translateY(-3px) scale(1.01);box-shadow:0 12px 28px -12px rgba(34,211,238,.5)}
+.quiz-option .qo-text{flex:1;font-weight:700;line-height:1.45}
+.quiz-option.correct{border-color:var(--green);background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(52,211,153,.05));color:var(--green)}
+.quiz-option.correct .qo-letter{background:var(--green);color:#0a1220;border-color:var(--green)}
+.quiz-option.correct .qo-text{color:var(--green);font-weight:800}
+.quiz-option.correct::after{content:'✓';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:1.4rem;font-weight:900;color:var(--green)}
+.quiz-option.wrong{border-color:var(--red);background:linear-gradient(135deg,rgba(248,113,113,.18),rgba(248,113,113,.05));color:var(--red)}
+.quiz-option.wrong .qo-letter{background:var(--red);color:#0a1220;border-color:var(--red)}
+.quiz-option.wrong .qo-text{color:var(--red);font-weight:800}
+.quiz-option.wrong::after{content:'✗';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:1.4rem;font-weight:900;color:var(--red)}
+.quiz-option:disabled{cursor:default;pointer-events:none}
+.quiz-feedback{margin-top:16px;padding:16px 18px;border-radius:14px;font-size:.88rem;line-height:1.7}
+.quiz-feedback.good{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(52,211,153,.03));border:1px solid rgba(52,211,153,.45);color:#c3d2e6}
+.quiz-feedback.bad{background:linear-gradient(135deg,rgba(248,113,113,.12),rgba(248,113,113,.03));border:1px solid rgba(248,113,113,.45);color:#c3d2e6}
+.quiz-feedback .qf-head{font-weight:900;font-size:.95rem;margin-bottom:6px}
+.quiz-feedback.good .qf-head{color:var(--green)}
+.quiz-feedback.bad .qf-head{color:var(--red)}
+.quiz-feedback .qf-body{color:#cdd9ea;line-height:1.65}
+.feedback{padding:14px 16px;border-radius:13px;font-size:.86rem;line-height:1.65;margin-top:14px}
+.feedback.good{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);color:#c3d2e6}
+.feedback.bad{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.4);color:#c3d2e6}
+.feedback b{color:var(--txt)}
+.end-hero{text-align:center;margin-bottom:16px}
+.end-hero .big-emoji{font-size:3.5rem;display:inline-block}
+.end-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0 22px}
+.end-stat{background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:12px;padding:12px 18px;text-align:center;min-width:100px}
+.end-stat .n{font-size:1.4rem;font-weight:900;display:block}
+.end-stat .t{font-size:.6rem;font-weight:800;letter-spacing:1px;color:var(--muted);margin-top:3px}
+.end-stat .n.g{color:var(--green)}.end-stat .n.r{color:var(--red)}
+
+.review-list{margin-top:14px;background:rgba(3,6,13,.5);border:1px solid var(--line);border-radius:13px;padding:14px;max-height:560px;overflow-y:auto;text-align:left}
+.review-section-head{font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--muted);margin:18px 0 8px}
+.review-item{padding:12px 0;border-bottom:1px dashed rgba(255,255,255,.08);font-size:.82rem;line-height:1.55;color:#c3d2e6}
+.review-item:last-child{border-bottom:none;padding-bottom:0}
+.review-item:first-child{padding-top:0}
+.review-item .ri-head{font-weight:900;margin-bottom:8px;font-size:.86rem;line-height:1.4}
+.review-item.good .ri-head{color:var(--green)}
+.review-item.bad .ri-head{color:var(--red)}
+.ri-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.ri-badge{font-size:.62rem;font-weight:900;padding:3px 10px;border-radius:999px;border:1px solid;letter-spacing:.3px}
+.ri-badge.sel-on{background:rgba(34,211,238,.15);color:var(--cyan);border-color:rgba(34,211,238,.4)}
+.ri-badge.sel-off{background:rgba(139,160,190,.12);color:#8ba0be;border-color:rgba(139,160,190,.35)}
+.ri-badge.sel-none{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.35)}
+.ri-badge.ri-ok{background:rgba(52,211,153,.15);color:var(--green);border-color:rgba(52,211,153,.45)}
+.ri-badge.ri-ko{background:rgba(248,113,113,.15);color:var(--red);border-color:rgba(248,113,113,.45)}
+.ri-badge.ri-correct{background:rgba(167,139,250,.12);color:var(--violet);border-color:rgba(167,139,250,.35)}
+.ri-body{font-size:.8rem;line-height:1.6;color:#cdd9ea}
+
+.final-hero{text-align:center;padding:20px 0;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.final-hero .trophy{font-size:4rem;display:inline-block}
+.final-hero .final-score{font-size:3rem;font-weight:900;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1;margin-top:8px}
+.final-hero .final-lbl{font-size:.7rem;font-weight:900;letter-spacing:2px;color:var(--muted);margin-top:4px}
+.final-rank{text-align:center;font-size:1rem;font-weight:900;padding:14px;border-radius:14px;margin:16px 0;border:1px solid}
+.breakdown-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}
+.bk-card{background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:13px;padding:12px;text-align:center}
+.bk-card .bk-ico{font-size:1.5rem}
+.bk-card .bk-name{font-size:.7rem;font-weight:800;color:var(--muted);margin-top:4px}
+.bk-card .bk-score{font-size:1.1rem;font-weight:900;margin-top:6px}
+.bk-card .bk-acc{font-size:.65rem;color:var(--muted);margin-top:2px}
+.bk-card.strong{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08)}
+.bk-card.mid{border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.08)}
+.bk-card.weak{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08)}
+.ai-box{background:linear-gradient(160deg,rgba(34,211,238,.08),rgba(167,139,250,.08));border:1px solid rgba(34,211,238,.35);border-radius:16px;padding:20px;margin:18px 0}
+.ai-box .ai-head{display:flex;align-items:center;gap:10px;font-size:.75rem;font-weight:900;letter-spacing:1.5px;color:var(--cyan);margin-bottom:12px}
+.ai-box .ai-head .ai-ico{width:32px;height:32px;border-radius:50%;background:rgba(34,211,238,.15);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.ai-box .ai-text{font-size:.9rem;line-height:1.75;color:#cdd9ea}
+.ai-box .ai-text b{color:var(--cyan)}
+.tips-section{margin:18px 0}
+.tips-section .tips-head{font-size:.72rem;font-weight:900;letter-spacing:1.8px;color:var(--amber);text-align:center;margin-bottom:14px}
+.tip-block{background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.tip-block .tip-title{font-size:.88rem;font-weight:900;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.tip-block .tip-list{list-style:none;padding:0}
+.tip-block .tip-list li{font-size:.82rem;line-height:1.6;color:#cdd9ea;padding:5px 0 5px 20px;position:relative}
+.tip-block .tip-list li::before{content:'→';position:absolute;left:0;color:var(--cyan);font-weight:900}
+.toast{position:fixed;top:80px;left:50%;transform:translate(-50%,-16px);z-index:200;font-weight:900;font-size:1rem;padding:9px 22px;border-radius:999px;background:rgba(6,10,18,.96);border:1px solid var(--line);opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.good{color:var(--green);border-color:rgba(52,211,153,.5)}
+.toast.bad{color:var(--red);border-color:rgba(248,113,113,.5)}
+</style>
+</head>
+<body>
+
+<div class="cyber-bg">
+  <div class="base"></div>
+  <canvas id="matrix"></canvas>
+  <div class="grid"></div>
+</div>
+
+<header class="hud">
+  <div class="hud-inner">
+    <div class="chip"><span class="lbl">PUNTOS</span><span class="val" id="hudScore">0</span></div>
+    <div class="chip"><span class="lbl">TEMA</span><span class="val" id="hudTema">—</span></div>
+    <div class="chip"><span class="lbl">ESTADO</span><span class="val" id="hudQ">—</span></div>
+    <div class="dots" id="hudDots"></div>
+  </div>
+</header>
+
+<main id="stage"></main>
+
+<script>
+(function(){
+  var c=document.getElementById('matrix');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  var W,H,cols,yPos,fontSize=14;
+  var chars='01ABCDEF#$%&*/\\|<>{}[]=+-';
+  function resize(){
+    W=c.width=window.innerWidth;
+    H=c.height=window.innerHeight;
+    cols=Math.floor(W/fontSize);
+    yPos=[];
+    for(var i=0;i<cols;i++) yPos.push(Math.random()*H);
+  }
+  resize();
+  window.addEventListener('resize',resize);
+  function draw(){
+    ctx.fillStyle='rgba(3,6,13,0.07)';
+    ctx.fillRect(0,0,W,H);
+    ctx.font=fontSize+'px monospace';
+    for(var i=0;i<cols;i++){
+      var ch=chars[Math.floor(Math.random()*chars.length)];
+      var x=i*fontSize;
+      var y=yPos[i];
+      var r=Math.random();
+      if(r>0.98){ctx.fillStyle='#c8faff';ctx.shadowColor='#22d3ee';ctx.shadowBlur=8;}
+      else if(r>0.85){ctx.fillStyle='#22d3ee';ctx.shadowBlur=4;}
+      else{ctx.fillStyle='#0e6b6b';ctx.shadowBlur=0;}
+      ctx.fillText(ch,x,y);
+      if(y>H&&Math.random()>0.975) yPos[i]=0;
+      else yPos[i]+=fontSize;
+    }
+    ctx.shadowBlur=0;
+  }
+  var last=0;
+  function loop(t){ if(t-last>55){draw();last=t;} requestAnimationFrame(loop); }
+  requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   DATOS DE LOS JUEGOS
+   ============================================================ */
+
+var G1 = [
+  { isBad:true, senderName:'BBVA Seguridad', from:'atencion@bbva-clientes-seguridad.net', subject:'Tu cuenta ha sido bloqueada',
+    body:'Detectamos actividad sospechosa en tu cuenta. Pulsa este enlace en 24 h para verificar tu identidad o bloquearemos tu cuenta permanentemente.',
+    time:'09:14', priority:'urgent', attachment:'Verificacion.html',
+    why:'El banco de verdad usa "bbva.es". Este dominio añade palabras raras con guiones para parecer oficial.' },
+  { isBad:false, senderName:'GitHub', from:'no-reply@github.com', subject:'Nuevo inicio de sesión en tu cuenta',
+    body:'Hemos detectado un nuevo inicio de sesión desde Madrid (España). Si no fuiste tú, cambia tu contraseña desde la web oficial.',
+    time:'11:32', priority:null, attachment:null,
+    why:'El remitente es el real de GitHub. No pide datos ni enlaces raros.' },
+  { isBad:true, senderName:'PayPal', from:'soporte@paypa1.com', subject:'Verifica tu cuenta urgente',
+    body:'Tu cuenta está limitada. Haz clic en el enlace para restaurar el acceso. Este enlace caduca en 24 horas.',
+    time:'03:47', priority:'urgent', attachment:null,
+    why:'"paypa1" con un 1 en lugar de la "l" de PayPal. Además llegó a las 3:47 de la madrugada.' },
+  { isBad:false, senderName:'RRHH - Tu Empresa', from:'rrhh@tuempresa.com', subject:'Recordatorio: formación de seguridad',
+    body:'Recuerda que el próximo jueves a las 10 h tienes la sesión obligatoria de formación en ciberseguridad.',
+    time:'08:00', priority:null, attachment:null,
+    why:'Viene de tu propia empresa, no mete prisa y no pide datos.' },
+  { isBad:true, senderName:'Correos', from:'noreply@correos.es', subject:'Tu paquete no ha podido entregarse',
+    body:'Tu paquete está retenido en la oficina. Pulsa bit.ly/entrega-paq para actualizar tu dirección y pagar 1,50 € de gastos.',
+    time:'17:23', priority:null, attachment:null,
+    why:'Correos NUNCA usa enlaces acortados (bit.ly) ni cobra 1,50 € por email.' },
+  { isBad:false, senderName:'Banco Santander', from:'seguridad@bancosantander.com', subject:'Acceso desde nuevo dispositivo',
+    body:'Se ha accedido a tu cuenta desde un dispositivo nuevo. Si eres tú, ignora este mensaje. Si no, contacta por la app oficial.',
+    time:'20:11', priority:null, attachment:null,
+    why:'El dominio es el correcto y no te pide datos.' },
+  { isBad:true, senderName:'IT Support', from:'it-support@tuempresa-corp.net', subject:'Actualiza tu contraseña de VPN',
+    body:'Por motivos de seguridad debes actualizar tu contraseña de VPN HOY. Introduce tu contraseña actual en el formulario adjunto.',
+    time:'22:48', priority:'urgent', attachment:'Actualizar_VPN.html',
+    why:'El dominio NO es el de tu empresa. Y pide tu contraseña actual.' },
+  { isBad:false, senderName:'Amazon.es', from:'pedidos@amazon.es', subject:'Tu pedido ha sido enviado',
+    body:'Tu pedido #123-456 ha salido del almacén. Podrás seguirlo desde "Mis pedidos" en la web oficial.',
+    time:'14:05', priority:null, attachment:null,
+    why:'Remitente correcto, no pide datos.' }
+];
+
+var G2 = [
+  { tag:'🌐 Navegación web', icon:'🌐', question:'Cuando ves el candado 🔒 en la barra del navegador, ¿qué significa?',
+    options:['Que la web carga más rápido','Que la conexión está cifrada y nadie puede leer lo que envías','Que la web es gratis y sin anuncios'],
+    correct:1, why:'El candado significa que la conexión usa HTTPS: todo lo que envías viaja cifrado.' },
+  { tag:'📶 WiFi', icon:'📶', question:'¿Para qué sirve la contraseña del WiFi de casa?',
+    options:['Solo para que no la use el vecino','Para que el tráfico entre tus dispositivos y el router vaya cifrado','Para que el WiFi sea más rápido'],
+    correct:1, why:'Además de evitar que otros entren, la contraseña activa el cifrado WPA2 o WPA3.' },
+  { tag:'💬 Mensajería', icon:'💬', question:'WhatsApp dice que usa "cifrado de extremo a extremo". ¿Qué protege?',
+    options:['El contenido de los mensajes: solo tú y quien los recibe podéis leerlos','El precio de los datos','La velocidad de envío'],
+    correct:0, why:'El mensaje se cierra con llave en tu móvil y solo se abre en el del receptor.' },
+  { tag:'🌐 HTTP vs HTTPS', icon:'🔒', question:'¿Cuál es la diferencia principal entre "http://" y "https://"?',
+    options:['HTTPS es más moderna y rápida','HTTPS cifra la conexión; HTTP la deja sin cifrar','HTTP es solo para vídeos y HTTPS para bancos'],
+    correct:1, why:'La "s" final significa "seguro": la conexión va cifrada con TLS.' },
+  { tag:'🔑 Contraseñas guardadas', icon:'🔑', question:'Cuando creas una cuenta, ¿qué guarda normalmente el servidor?',
+    options:['Tu contraseña tal cual, en texto plano','Una especie de "huella digital" (hash) que no se puede revertir fácilmente','Solo tu correo electrónico'],
+    correct:1, why:'Los servicios serios guardan un hash de tu contraseña, no la contraseña en sí.' }
+];
+
+var G4 = [
+  { isBad:false, icon:'📄', name:'Factura.pdf', why:'PDF normal, sin macros.' },
+  { isBad:true,  icon:'📄', name:'Presupuesto.pdf.exe', why:'Doble extensión: parece PDF pero es ejecutable.' },
+  { isBad:false, icon:'🖼️', name:'foto_vacaciones.jpg', why:'Imagen normal.' },
+  { isBad:true,  icon:'⚙️', name:'photoshop_gratis.exe', why:'Software pirata. Vector de troyanos.' },
+  { isBad:false, icon:'📊', name:'nomina_marzo.xlsx', why:'Hoja de cálculo normal.' },
+  { isBad:true,  icon:'📊', name:'nomina_marzo.xlsm', why:'Extensión .xlsm con macros.' },
+  { isBad:false, icon:'🎵', name:'cancion.mp3', why:'Archivo de audio normal.' },
+  { isBad:true,  icon:'🔧', name:'crack_windows.exe', why:'Los cracks casi siempre llevan malware.' },
+  { isBad:false, icon:'🎬', name:'pelicula.mp4', why:'Vídeo normal.' },
+  { isBad:true,  icon:'💾', name:'usb_desconocido.exe', why:'Ejecutable desconocido de un USB.' }
+];
+
+var G5 = [
+  { icon:'☕', level:'Nivel 1 · Básico', title:'WiFi público en una cafetería',
+    desc:'Estás en una cafetería y necesitas revisar tu correo personal. Te has conectado a la red WiFi abierta del local, que no tiene contraseña. Cualquiera en el local podría estar conectado a la misma red. ¿Qué medidas deberías tomar?',
+    traps:1,
+    toggles:[
+      { icon:'🛡️', label:'Activar una VPN', sub:'Cifra todo el tráfico que sale de tu dispositivo hasta un servidor de confianza', correct:true,
+        why:'La VPN cifra todo el tráfico. Sin ella, cualquiera en la misma red puede interceptar lo que envías.' },
+      { icon:'🔐', label:'Comprobar que las webs usan HTTPS', sub:'Antes de escribir cualquier dato, asegúrate de ver el candado 🔒 en la barra', correct:true,
+        why:'HTTPS cifra la conexión entre tú y la web. En una red abierta, es imprescindible verificar el candado antes de meter datos.' },
+      { icon:'🚫', label:'Evitar operar con datos sensibles', sub:'Deja el banco y el correo importante para cuando estés en una red de confianza', correct:true,
+        why:'Cada dato que envías por una red abierta puede ser interceptado. Mejor esperar a estar en una red de confianza.' },
+      { icon:'📂', label:'Permitir compartir archivos por la red', sub:'Deja tus carpetas visibles para cualquier dispositivo en la misma WiFi', correct:false,
+        why:'En una WiFi abierta, dejar tus carpetas visibles es un riesgo enorme. Cualquiera podría acceder a tus archivos.' },
+      { icon:'⚡', label:'Desactivar la VPN para que todo vaya más rápido', sub:'La VPN añade latencia; sin ella, la conexión es más ágil', correct:false,
+        why:'Desactivar la VPN por velocidad expone todo tu tráfico. La velocidad no compensa la pérdida de seguridad.' }
+    ]},
+  { icon:'📡', level:'Nivel 2 · Intermedio', title:'Router nuevo en casa',
+    desc:'Acabas de instalar el router que te dio tu operadora. Viene con usuario "admin" y contraseña "admin" de fábrica. Quieres conectarlo todo rápido. ¿Qué deberías hacer?',
+    traps:1,
+    toggles:[
+      { icon:'🔑', label:'Cambiar las credenciales por defecto del router', sub:'"admin/admin" está en todas las listas de atacantes del mundo', correct:true,
+        why:'"admin/admin" está en todas las listas de atacantes. Cambiarla es lo primero que debes hacer.' },
+      { icon:'⬆️', label:'Actualizar el firmware del router', sub:'Los parches cierran agujeros de seguridad ya conocidos', correct:true,
+        why:'Los parches cierran vulnerabilidades conocidas. Sin actualizar, tu router es una puerta abierta.' },
+      { icon:'📶', label:'Poner WPA3 con una contraseña fuerte al WiFi', sub:'WPA3 es el estándar más moderno de cifrado WiFi', correct:true,
+        why:'WPA3 es el cifrado más moderno. WPA2 con contraseña fuerte también vale, pero WPA3 es mejor.' },
+      { icon:'🔓', label:'Activar WPS para conectar los dispositivos fácilmente', sub:'Con solo pulsar un botón, los dispositivos se conectan sin escribir la clave', correct:false,
+        why:'WPS tiene una vulnerabilidad grave conocida. Aunque sea cómodo, permite a un atacante entrar con un ataque de PIN.' },
+      { icon:'🌍', label:'Dejar el acceso WAN del router activado', sub:'Permite administrar el router desde internet', correct:false,
+        why:'Dejar la administración del router accesible desde internet es un riesgo enorme. Un atacante podría intentar entrar.' }
+    ]},
+  { icon:'🏠', level:'Nivel 3 · Intermedio+', title:'Dispositivos inteligentes en casa',
+    desc:'Tienes una cámara, un altavoz inteligente y una Smart TV conectados a la misma red WiFi que tus ordenadores. Los fabricantes de IoT suelen abandonar el firmware al año o dos. ¿Cómo los proteges?',
+    traps:1,
+    toggles:[
+      { icon:'🔀', label:'Separarlos en una red de invitados', sub:'Si uno se compromete, no puede saltar a tus ordenadores personales', correct:true,
+        why:'Aíslas los dispositivos débiles. Si uno se compromete, no puede saltar a tus ordenadores.' },
+      { icon:'🔑', label:'Cambiar sus contraseñas por defecto', sub:'Los fabricantes ponen la misma clave en todos los dispositivos del modelo', correct:true,
+        why:'Los fabricantes ponen la misma clave en todos los dispositivos del mismo modelo. Cambiarla es esencial.' },
+      { icon:'⬆️', label:'Actualizar su firmware', sub:'Cierra vulnerabilidades conocidas del fabricante', correct:true,
+        why:'Los IoT suelen tener firmware antiguo. Actualizarlo cierra agujeros conocidos.' },
+      { icon:'🌐', label:'Darles una IP pública fija', sub:'Así puedes acceder a la cámara desde el móvil estés donde estés', correct:false,
+        why:'Dar una IP pública fija a un dispositivo IoT es exponerlo a internet. Cualquiera podría intentar acceder.' },
+      { icon:'⚠️', label:'Conectarlos a la misma red que tus ordenadores', sub:'Así compartes archivos con la Smart TV más fácilmente', correct:false,
+        why:'Si un dispositivo débil se infecta, puede atacar a tus ordenadores. Mejor separarlos en otra red.' }
+    ]}
+];
+
+var G6 = [
+  { isBad:true, platform:'whatsapp', platformName:'WhatsApp', icon:'📱', sender:'+34 612 345 678', time:'20:47',
+    message:'"Mamá, he perdido el móvil, este es mi número nuevo. Necesito 800 € urgente para pagar una multa. No llames, estoy en una reunión."',
+    why:'Patrón del "fraude del familiar": número nuevo + urgencia + dinero + "no llames".' },
+  { isBad:false, platform:'email', platformName:'Correo electrónico', icon:'📧', sender:'Equipo - Tu Empresa', time:'11:32',
+    message:'"Recordatorio: la reunión del equipo se ha movido al jueves a las 10 h. Enlace en el calendario compartido."',
+    why:'Sin urgencia, sin petición de datos.' },
+  { isBad:true, platform:'call', platformName:'Llamada entrante', icon:'📞', sender:'Microsoft Support', time:'—',
+    message:'"Le llamo de Microsoft. Hemos detectado un virus en su ordenador. ¿Me permite acceso remoto para solucionarlo?"',
+    why:'Microsoft NUNCA llama a usuarios domésticos para decirles que tienen un virus.' },
+  { isBad:true, platform:'sms', platformName:'SMS', icon:'💬', sender:'BBVA', time:'17:12',
+    message:'"BBVA: se ha detectado un acceso no autorizado. Pulse aquí para bloquear su tarjeta: bbva-seguridad-alerta.com"',
+    why:'El dominio "bbva-seguridad-alerta.com" NO es del BBVA (real: bbva.es).' },
+  { isBad:false, platform:'email', platformName:'Correo electrónico', icon:'📧', sender:'Javier (Contabilidad)', time:'09:15',
+    message:'"Hola, soy tu compañero Javier de Contabilidad. Te adjunto la factura que comentamos ayer."',
+    why:'Sin urgencia, sin petición de dinero.' },
+  { isBad:false, platform:'email', platformName:'Correo electrónico', icon:'📧', sender:'RRHH - Tu Empresa', time:'08:00',
+    message:'"Recordatorio: la sesión de formación de ciberseguridad del jueves sigue en pie."',
+    why:'Recordatorio interno, sin enlaces raros.' },
+  { isBad:true, platform:'call', platformName:'Llamada entrante', icon:'📞', sender:'Banco Santander', time:'—',
+    message:'"Le llamo de su banco. Dígame el código que acaba de recibir por SMS para cancelar un cargo sospechoso."',
+    why:'Ningún banco pide el código de verificación por teléfono. Nunca.' },
+  { isBad:false, platform:'whatsapp', platformName:'WhatsApp', icon:'📱', sender:'Laura', time:'15:30',
+    message:'"Hola, soy Laura. Te confirmo la cita del dentista para el martes a las 17:00."',
+    why:'Mensaje corto, sin urgencia, sin pedir datos.' },
+  { isBad:true, platform:'instagram', platformName:'Instagram', icon:'📷', sender:'sorteos_oficiales_es', time:'21:05',
+    message:'"🎉 ¡Enhorabuena! Has ganado un iPhone 15. Solo paga 5 € de envío. Escríbeme por privado."',
+    why:'Los sorteos legítimos no se comunican por DM ni piden dinero.' },
+  { isBad:false, platform:'email', platformName:'Correo electrónico', icon:'📧', sender:'Amazon.es', time:'14:05',
+    message:'"Tu pedido #123-456 ha sido enviado. Podrás seguirlo desde \'Mis pedidos\'."',
+    why:'Notificación de envío normal.' }
+];
+
+var GAMES = [
+  { id:'phishing',    name:'Phishing y estafas',  icon:'🎣', color:'#f87171', type:'clicker', layout:'cols-2', itemKind:'email',   data:G1, count:G1.length },
+  { id:'encriptado',  name:'Encriptado',          icon:'🔐', color:'#22d3ee', type:'quiz',                                       data:G2, count:G2.length },
+  { id:'contrasenas', name:'Contraseñas',         icon:'🔑', color:'#a78bfa', type:'password',                                   data:[], count:1 },
+  { id:'malware',     name:'Malware',             icon:'🦠', color:'#fb923c', type:'clicker', layout:'cols-4', itemKind:'file',    data:G4, count:G4.length },
+  { id:'redes',       name:'Redes y WiFi',        icon:'📶', color:'#60a5fa', type:'config',                                     data:G5, count:G5.length },
+  { id:'ingSocial',   name:'Ingeniería social',   icon:'🧠', color:'#f472b6', type:'clicker', layout:'cols-2', itemKind:'message', data:G6, count:G6.length }
+];
+GAMES.forEach(function(g){
+  if(g.type==='clicker') g.max = g.count * 20;
+  else if(g.type==='quiz') g.max = g.count * 20;
+  else if(g.type==='config') g.max = g.count * 50;
+  else if(g.type==='password') g.max = 200;
+});
+var TOTAL_MAX = GAMES.reduce(function(a,g){return a+g.max;},0);
+
+var TIPS = {
+  phishing: ['Antes de hacer clic en un correo, mira la dirección real del remitente.','Si un mensaje mete prisa, sospecha.','Cuando dudes, entra tú mismo a la web oficial escribiendo la dirección a mano.'],
+  encriptado: ['Busca siempre el candado 🔒 antes de escribir contraseñas o datos de tarjeta.','En redes WiFi públicas, usa VPN o los datos móviles para lo importante.','Prefiere apps con cifrado de extremo a extremo.'],
+  contrasenas: ['Usa una contraseña distinta para cada servicio.','Cuanto más larga, mejor: una frase de 5-6 palabras es más fuerte.','Activa la verificación en dos pasos (2FA) sobre todo en tu correo electrónico.'],
+  malware: ['Nunca descargues software pirata.','No conectes USBs que encuentres ni abras adjuntos inesperados.','Mantén el sistema y las apps actualizadas.'],
+  redes: ['Cambia la contraseña por defecto de tu router y actualiza su firmware.','Pon los dispositivos inteligentes en una red de invitados separada.','Desconfía de opciones que suenan a "mejorar velocidad" a costa de seguridad.'],
+  ingSocial: ['Desconfía de la urgencia emocional.','Verifica por otro canal cualquier petición de dinero.','No publiques en redes que estás de vacaciones mientras estás fuera.']
+};
+
+function shuffleArray(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+function shuffleQuestion(q){
+  var indices = q.options.map(function(_,i){ return i; });
+  var shuffled = shuffleArray(indices);
+  var newOptions = shuffled.map(function(idx){ return q.options[idx]; });
+  var newCorrect = shuffled.indexOf(q.correct);
+  return { tag:q.tag, icon:q.icon, question:q.question, options:newOptions, correct:newCorrect, why:q.why };
+}
+
+/* ============================================================
+   IA AVANZADA DE CONTRASEÑAS
+   Modela 4 escenarios de ataque con velocidades reales de hashcat
+   ============================================================ */
+
+var COMMON_PW = ['123456','password','12345678','qwerty','123456789','12345','1234','111111','1234567','dragon','123123','baseball','abc123','football','monkey','letmein','696969','shadow','master','666666','qwertyuiop','123321','mustang','1234567890','michael','654321','superman','1qaz2wsx','7777777','121212','000000','qazwsx','123qwe','killer','trustno1','jordan','jennifer','zxcvbnm','asdfgh','hunter','buster','soccer','harley','batman','andrew','tigger','sunshine','iloveyou','2000','charlie','robert','thomas','hockey','ranger','daniel','starwars','klaster','112233','george','computer','michelle','jessica','pepper','1111','zxcvbn','555555','11111111','131313','freedom','777777','pass','maggie','159753','aaaaaa','ginger','princess','joshua','cheese','amanda','summer','love','ashley','6969','nicole','chelsea','biteme','matthew','access','yankees','987654321','dallas','austin','thunder','taylor','matrix'];
+var DICT_WORDS = ['password','admin','user','login','welcome','secret','love','iloveyou','qwerty','abc','test','demo','letmein','master','root','toor','default','guest','asdf','zxcv','michael','jennifer','jesus','angel','dragon','monkey','football','baseball','soccer','hockey','shadow','sunshine','princess','freedom','whatever','trustno','computer','internet','google','facebook','amazon','apple','microsoft','samsung','iphone','android'];
+
+// Velocidades medidas en RTX 4090 (hashcat v7.0.0 / v6.2.6) — hashes/segundo
+var HASH_SPEEDS = {
+  'MD5':      164100000000,   // 164.1 GH/s
+  'SHA-1':     50638700000,   // 50.6 GH/s
+  'SHA-256':   21975500000,   // 21.9 GH/s
+  'SHA-512':    7483400000,   // 7.5 GH/s
+  'bcrypt':        1400,      // cost 12 (aprox)
+  'Argon2id':        25       // ~25 H/s
+};
+
+function analyzePassword(pw){
+  var results = {
+    score: 0,
+    strengths: [],
+    weaknesses: [],
+    recommendations: [],
+    crackScenarios: [],
+    primaryCrackTime: '',
+    level: null,
+    length: pw ? pw.length : 0
+  };
+
+  if (!pw || pw.length === 0) {
+    results.weaknesses.push('La contraseña está vacía.');
+    results.primaryCrackTime = 'instantáneo';
+    results.level = classifyPasswordStrength(0);
+    return results;
+  }
+
+  var len = pw.length;
+  var lower = pw.toLowerCase();
+  var hasLower = /[a-z]/.test(pw);
+  var hasUpper = /[A-Z]/.test(pw);
+  var hasDigit = /[0-9]/.test(pw);
+  var hasSymbol = /[^a-zA-Z0-9]/.test(pw);
+  var hasSpace = /\s/.test(pw);
+
+  var charset = 0;
+  if (hasLower) charset += 26;
+  if (hasUpper) charset += 26;
+  if (hasDigit) charset += 10;
+  if (hasSymbol) charset += 33;
+  if (hasSpace) charset += 1;
+  if (charset === 0) charset = 1;
+
+  // --- LONGITUD (máx 60 pts) ---
+  var lenScore = 0;
+  if (len < 8) lenScore = 0;
+  else if (len < 12) lenScore = 15;
+  else if (len < 16) lenScore = 30;
+  else if (len < 20) lenScore = 45;
+  else lenScore = 60;
+  results.score += lenScore;
+
+  if (len >= 16) results.strengths.push('Longitud excelente (' + len + ' caracteres): muy difícil de romper por fuerza bruta.');
+  else if (len >= 12) results.strengths.push('Longitud buena (' + len + ' caracteres).');
+  else if (len < 8) results.weaknesses.push('Longitud insuficiente (' + len + ' caracteres). Lo recomendable es 12–16 o más.');
+  else results.weaknesses.push('Longitud corta (' + len + ' caracteres). Intenta llegar a 16+.');
+
+  // --- VARIEDAD (máx 55 pts) ---
+  var varietyScore = 0;
+  var typesCount = 0;
+  if (hasLower) { varietyScore += 10; typesCount++; }
+  if (hasUpper) { varietyScore += 10; typesCount++; }
+  if (hasDigit) { varietyScore += 10; typesCount++; }
+  if (hasSymbol) { varietyScore += 15; typesCount++; }
+  if (hasSpace) { varietyScore += 5; typesCount++; }
+  varietyScore = Math.min(varietyScore, 55);
+  results.score += varietyScore;
+
+  if (typesCount >= 4) results.strengths.push('Combinas varios tipos de caracteres. Excelente variedad.');
+  else if (typesCount === 3) results.strengths.push('Usas 3 tipos de caracteres. Bien, pero puedes añadir más variedad.');
+  else if (typesCount <= 2) results.weaknesses.push('Solo usas ' + typesCount + ' tipo(s) de caracteres. Combina mayúsculas, minúsculas, números y símbolos.');
+
+  if (!hasUpper) results.weaknesses.push('No contiene mayúsculas.');
+  if (!hasDigit) results.weaknesses.push('No contiene números.');
+  if (!hasSymbol) results.weaknesses.push('No contiene símbolos especiales (ej. !@#$%^&*).');
+
+  // --- PATRONES COMUNES ---
+  var isCommon = COMMON_PW.indexOf(lower) !== -1;
+  if (isCommon) {
+    results.weaknesses.push('⚠️ Está en las listas de contraseñas más usadas del mundo. Se rompe en segundos.');
+    results.score -= 60;
+  }
+
+  var dictHit = null;
+  for (var i = 0; i < DICT_WORDS.length; i++) {
+    if (lower.indexOf(DICT_WORDS[i]) !== -1) { dictHit = DICT_WORDS[i]; break; }
+  }
+  if (dictHit) {
+    results.weaknesses.push('Contiene la palabra común "' + dictHit + '", fácil de adivinar.');
+    results.score -= 20;
+  }
+
+  var yearMatch = pw.match(/(19|20)\d{2}/);
+  if (yearMatch) {
+    results.weaknesses.push('Contiene un año (' + yearMatch[0] + '), típico en cumpleaños y fechas.');
+    results.score -= 10;
+  }
+
+  if (/012|123|234|345|456|567|678|789/.test(pw)) {
+    results.weaknesses.push('Contiene una secuencia numérica (123...). Los atacantes la prueban primero.');
+    results.score -= 15;
+  }
+  if (/abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz/i.test(pw)) {
+    results.weaknesses.push('Contiene una secuencia alfabética (abc...). Patrón muy predecible.');
+    results.score -= 15;
+  }
+  if (/(.)\1{2,}/.test(pw)) {
+    results.weaknesses.push('Contiene 3 o más caracteres repetidos. Reduce la entropía.');
+    results.score -= 10;
+  }
+  if (/qwerty|asdf|zxcv|qaz|wsx|edc/i.test(pw)) {
+    results.weaknesses.push('Contiene un patrón de teclado (qwerty, asdf...). Muy predecible.');
+    results.score -= 20;
+  }
+
+  // --- BONUS ---
+  if (len >= 16 && typesCount >= 3 && !isCommon && !yearMatch) {
+    results.score += 20;
+    results.strengths.push('Longitud y variedad cumplen los estándares modernos.');
+  }
+  if (len >= 20 && hasSpace) {
+    results.score += 25;
+    results.strengths.push('Frase larga con espacios: gran entropía y fácil de recordar.');
+  }
+
+  // Normalizar 0–200
+  results.score = Math.max(0, Math.min(200, Math.round(results.score)));
+
+  // --- ESCENARIOS DE CRACKEO (basados en hashcat real) ---
+  results.crackScenarios = buildCrackScenarios(pw, {
+    len: len, charset: charset, typesCount: typesCount,
+    isCommon: isCommon, dictHit: dictHit, yearMatch: yearMatch
+  });
+
+  // Tiempo principal: el peor escenario realista (bcrypt + diccionario)
+  var worst = results.crackScenarios.reduce(function(a, b){
+    return (a.seconds > b.seconds) ? a : b;
+  }, { seconds: 0 });
+  results.primaryCrackTime = humanizeTime(worst.seconds);
+
+  // Mensaje resumen
+  if (worst.seconds < 60) results.weaknesses.push('⏱️ En el peor escenario realista, se descifraría en ' + results.primaryCrackTime + '.');
+  else if (worst.seconds >= 31536000) results.strengths.push('⏱️ En el peor escenario realista, tardaría ' + results.primaryCrackTime + '.');
+
+  // --- RECOMENDACIONES ---
+  if (len < 16) results.recommendations.push('Amplía la longitud a 16+ caracteres.');
+  if (!hasUpper) results.recommendations.push('Añade al menos una mayúscula.');
+  if (!hasDigit) results.recommendations.push('Añade al menos un número.');
+  if (!hasSymbol) results.recommendations.push('Añade al menos un símbolo (!@#$%^&*).');
+  if (typesCount < 4) results.recommendations.push('Combina los 4 tipos de caracteres.');
+  if (len < 20) results.recommendations.push('Considera una frase de 4–5 palabras con separadores.');
+  if (results.recommendations.length === 0) results.recommendations.push('¡Vas por buen camino! Mantén esta práctica.');
+
+  results.level = classifyPasswordStrength(results.score);
+  return results;
+}
+
+/**
+ * Genera 4 escenarios de crackeo con velocidades reales de hashcat.
+ * Devuelve [{ name, seconds, formatted, hashType }]
+ */
+function buildCrackScenarios(pw, meta){
+  var len = meta.len;
+  var charset = meta.charset;
+  var scenarios = [];
+
+  // 1) Fuerza bruta pura contra MD5 (el peor caso para contraseñas aleatorias)
+  var keyspaceFull = Math.pow(charset, len);
+  // hashcat prueba ~164 GH/s en MD5
+  var secondsBruteMD5 = keyspaceFull / HASH_SPEEDS['MD5'];
+  scenarios.push({
+    name: 'Fuerza bruta · MD5',
+    seconds: secondsBruteMD5,
+    formatted: humanizeTime(secondsBruteMD5),
+    hashType: 'MD5 (164 GH/s)'
+  });
+
+  // 2) Diccionario (rockyou ~14M) + reglas best64 → ~900M candidatos
+  // Si la contraseña contiene una palabra común, el diccionario la encuentra mucho antes
+  var dictCandidates = 14e6 * 64; // ~896M
+  var secondsDict;
+  if (meta.dictHit || meta.isCommon) {
+    // Si coincide con palabra común, puede estar entre los primeros
+    secondsDict = 1 / HASH_SPEEDS['bcrypt']; // ~instantáneo en bcrypt
+  } else if (meta.yearMatch) {
+    secondsDict = dictCandidates / 100 / HASH_SPEEDS['bcrypt']; // reducido por año
+  } else {
+    secondsDict = dictCandidates / HASH_SPEEDS['bcrypt'];
+  }
+  scenarios.push({
+    name: 'Diccionario + reglas · bcrypt',
+    seconds: secondsDict,
+    formatted: humanizeTime(secondsDict),
+    hashType: 'bcrypt cost 12 (1.4k H/s)'
+  });
+
+  // 3) Ataque híbrido (palabra + máscara de 4 dígitos) contra SHA-256
+  // ~14M palabras × 10^4 combinaciones = 1.4e11 candidatos
+  var hybridCandidates = 14e6 * 10000;
+  var secondsHybrid = hybridCandidates / HASH_SPEEDS['SHA-256'];
+  scenarios.push({
+    name: 'Híbrido (palabra+4 dígitos) · SHA-256',
+    seconds: secondsHybrid,
+    formatted: humanizeTime(secondsHybrid),
+    hashType: 'SHA-256 (22 GH/s)'
+  });
+
+  // 4) Peor caso realista: Argon2id + diccionario (lento por diseño)
+  // Argon2id ~25 H/s → 900M candidatos tardarían ~416 días
+  var secondsArgon = dictCandidates / HASH_SPEEDS['Argon2id'];
+  scenarios.push({
+    name: 'Diccionario · Argon2id',
+    seconds: secondsArgon,
+    formatted: humanizeTime(secondsArgon),
+    hashType: 'Argon2id (~25 H/s)'
+  });
+
+  return scenarios;
+}
+
+function humanizeTime(sec) {
+  if (!isFinite(sec)) return 'eones (más que la edad del universo)';
+  if (sec < 1) return 'menos de 1 segundo';
+  if (sec < 60) return Math.round(sec) + ' segundos';
+  if (sec < 3600) return Math.round(sec / 60) + ' minutos';
+  if (sec < 86400) return Math.round(sec / 3600) + ' horas';
+  if (sec < 2592000) return Math.round(sec / 86400) + ' días';
+  if (sec < 31536000) return Math.round(sec / 2592000) + ' meses';
+  if (sec < 3.15e9) return Math.round(sec / 31536000) + ' años';
+  if (sec < 3.15e12) return Math.round(sec / 3.15e9) + ' mil años';
+  if (sec < 3.15e15) return Math.round(sec / 3.15e12) + ' millones de años';
+  if (sec < 3.15e18) return Math.round(sec / 3.15e15) + ' mil millones de años';
+  return 'eones (más que la edad del universo)';
+}
+
+function classifyPasswordStrength(score) {
+  if (score >= 170) return { level: 'excelente', color: '#34d399', bg: 'rgba(52,211,153,.15)', label: '💎 Excelente' };
+  if (score >= 130) return { level: 'muy-fuerte', color: '#34d399', bg: 'rgba(52,211,153,.12)', label: '🟢 Muy fuerte' };
+  if (score >= 90)  return { level: 'fuerte', color: '#22d3ee', bg: 'rgba(34,211,238,.12)', label: '🔵 Fuerte' };
+  if (score >= 50)  return { level: 'medio', color: '#fbbf24', bg: 'rgba(251,191,36,.12)', label: '🟡 Medio' };
+  if (score >= 20)  return { level: 'debil', color: '#f87171', bg: 'rgba(248,113,113,.12)', label: '🟠 Débil' };
+  return { level: 'critico', color: '#f87171', bg: 'rgba(248,113,113,.15)', label: '🔴 Crítico' };
+}
+
+/* ============================================================
+   PERSISTENCIA CON LOCALSTORAGE
+   ============================================================ */
+
+var STORAGE_KEY = 'ciberjuegos_v1';
+
+function saveState(){
+  try {
+    var toSave = {
+      score: state.score,
+      results: state.results,
+      done: state.done
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch (e) { /* localStorage no disponible o lleno */ }
+}
+
+function loadState(){
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    var data = JSON.parse(raw);
+    if (data && typeof data === 'object') {
+      if (typeof data.score === 'number') state.score = data.score;
+      if (data.results && typeof data.results === 'object') state.results = data.results;
+      if (data.done && typeof data.done === 'object') state.done = data.done;
+      return true;
+    }
+  } catch (e) { /* datos corruptos → ignorar */ }
+  return false;
+}
+
+function clearPersistedState(){
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+
+/* ============================================================
+   ESTADO Y RENDER
+   ============================================================ */
+
+var state = {
+  screen:'lobby', gameIndex:0, score:0, results:{}, done:{},
+  items:[], ended:false,
+  quizIndex:0, quizSelected:-1,
+  configIndex:0, configToggles:[], configChecked:false,
+  sessionOk:0, sessionKo:0, sessionScore:0, review:[],
+  quizShuffled:null, configShuffled:null,
+  configTogglesInitialized:false, configTogglesForIndex:-1,
+  passwordInput:'',
+  passwordResult:null,
+  passwordBestResult:null,
+  passwordBestScore:0,
+  passwordPhase:'input'
+};
+
+var stage = document.getElementById('stage');
+function $id(id){ return document.getElementById(id); }
+
+function updateHUD(){
+  var el = $id('hudScore');
+  el.textContent = state.score;
+  el.className = 'val ' + (state.score>0?'pos':state.score<0?'neg':'');
+  if((state.screen==='game'||state.screen==='intro') && GAMES[state.gameIndex]){
+    $id('hudTema').textContent = GAMES[state.gameIndex].icon + ' ' + (state.gameIndex+1) + '/' + GAMES.length;
+  } else if(state.screen==='select'){ $id('hudTema').textContent = 'TEMAS'; }
+  else if(state.screen==='final'){ $id('hudTema').textContent = '🏁 FINAL'; }
+  else { $id('hudTema').textContent = '—'; }
+  var hudQ = $id('hudQ');
+  if(state.screen==='game'){
+    var g = GAMES[state.gameIndex];
+    if(g.type==='clicker') hudQ.textContent = state.items.filter(function(x){return x.marked;}).length + ' marcados';
+    else if(g.type==='quiz') hudQ.textContent = (state.quizIndex+1) + '/' + g.data.length;
+    else if(g.type==='config') hudQ.textContent = (state.configIndex+1) + '/' + g.data.length;
+    else if(g.type==='password') hudQ.textContent = state.passwordBestScore > 0 ? ('🏆 ' + state.passwordBestScore + '/200') : 'crea una';
+  } else if(state.screen==='select'){ hudQ.textContent = '★'; }
+  else if(state.screen==='final'){ hudQ.textContent = '🏁'; }
+  else { hudQ.textContent = '—'; }
+  var dots='';
+  for(var i=0;i<GAMES.length;i++){
+    var cls='dot';
+    if(state.done[GAMES[i].id]) cls+=' done';
+    else if(i===state.gameIndex && (state.screen==='game'||state.screen==='intro')) cls+=' on';
+    dots+='<span class="'+cls+'"></span>';
+  }
+  $id('hudDots').innerHTML = dots;
+}
+
+function toast(msg,type){
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.classList.add('show');},20);
+  setTimeout(function(){ t.classList.remove('show'); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },300); },1100);
+}
+function escHTML(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function getExt(name){
+  var parts = String(name).split('.');
+  return parts.length > 1 ? '.' + parts[parts.length - 1] : '';
+}
+
+function render(){
+  updateHUD();
+  if(state.screen==='lobby') return renderLobby();
+  if(state.screen==='select') return renderSelect();
+  if(state.screen==='intro') return renderIntro();
+  if(state.screen==='game') return renderGame();
+  if(state.screen==='end') return renderEnd();
+  if(state.screen==='final') return renderFinal();
+}
+
+function renderLobby(){
+  var maxRows = GAMES.map(function(g){
+    return '<div class="maxscore-row"><span class="ms-left">'+g.icon+' '+g.name+'</span><span class="ms-right">'+g.max+' pts</span></div>';
+  }).join('');
+  var allDone = Object.keys(state.done).length >= GAMES.length;
+  var finalButton = allDone ? '<button class="btn btn-final" data-action="go-final">🏆 Ver mi resultado final</button>' : '';
+  var resetButton = '<button class="btn btn-secondary" data-action="reset-all" style="margin-top:10px;color:var(--red);border-color:rgba(248,113,113,.3)">🗑️ Reiniciar progreso guardado</button>';
+  stage.innerHTML = '<div class="panel">' +
+    '<h1 class="title">🎮 CiberJuegos · <span>Aprende ciberseguridad jugando</span></h1>' +
+    '<p class="subtitle">Seis minijuegos educativos para aprender ciberseguridad a un nivel accesible.</p>' +
+    '<h3 style="font-size:.7rem;font-weight:900;letter-spacing:2px;color:var(--muted);text-align:center;margin-bottom:12px">📋 CÓMO FUNCIONA</h3>' +
+    '<div class="rules">' +
+      '<div class="rule"><div class="num">1</div><div>Hay <b>6 minijuegos</b>, cada uno con su propia mecánica y su propio tema.</div></div>' +
+      '<div class="rule"><div class="num">2</div><div>En los juegos de <b>marcar un grupo</b>, tú decides cuándo has terminado: pulsa <b style="color:var(--amber)">Finalizar</b> cuando creas que ya has marcado todas las respuestas correctas.</div></div>' +
+      '<div class="rule"><div class="num">3</div><div>En <b>Contraseñas</b> crearás tu propia contraseña y una IA te dará una puntuación de hasta 200 pts.</div></div>' +
+      '<div class="rule"><div class="num">4</div><div>Cada respuesta correcta suma y cada fallo resta. Los puntos se van acumulando.</div></div>' +
+      '<div class="rule"><div class="num">5</div><div>Si repites un minijuego, tu puntuación anterior <b>se descuenta al empezar</b>: solo cuenta la última.</div></div>' +
+      '<div class="rule"><div class="num">6</div><div>Al completar los 6 juegos, verás tu <b>resultado final</b> con un análisis personalizado.</div></div>' +
+      '<div class="rule"><div class="num">💾</div><div>Tu progreso se <b>guarda automáticamente</b> en este navegador. Puedes cerrar y volver cuando quieras.</div></div>' +
+    '</div>' +
+    '<div class="maxscore"><div class="maxscore-title">🏆 PUNTUACIÓN MÁXIMA POSIBLE</div>' + maxRows +
+    '<div class="maxscore-total"><span class="ms-left">TOTAL</span><span class="ms-right">' + TOTAL_MAX + ' pts</span></div></div>' +
+    finalButton +
+    '<button class="btn btn-primary" data-action="go-select">▶ Empezar a jugar</button>' +
+    resetButton + '</div>';
+}
+
+function renderSelect(){
+  var allDone = Object.keys(state.done).length >= GAMES.length;
+  var cards = GAMES.map(function(g,i){
+    var done = state.done[g.id];
+    var desc = g.type==='clicker' ? g.count+' elementos para marcar' :
+               g.type==='quiz' ? g.count+' preguntas' :
+               g.type==='password' ? 'Crea una contraseña · IA' : g.count+' escenarios';
+    return '<button class="tema-card '+(done?'done':'')+'" data-action="pick-game" data-val="'+i+'" style="--tc:'+g.color+'">' +
+      '<div class="tema-head"><div class="tema-ico-wrap">'+g.icon+'</div><div>' +
+      '<div class="tema-name">'+g.name+'</div><div class="tema-desc" style="margin-top:2px">'+desc+'</div></div></div>' +
+      '<div class="tema-max">Máx: '+g.max+' pts</div>' +
+      (done?'<span class="tag tag-done">✓ COMPLETADO</span>':'') +
+    '</button>';
+  }).join('');
+  stage.innerHTML = '<div class="panel">' +
+    '<h1 class="title" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">🎮 Elige un <span>minijuego</span></h1>' +
+    '<p class="subtitle">Cada tema tiene su propia mecánica. Puedes jugarlos en cualquier orden.</p>' +
+    '<div class="temas-grid">' + cards + '</div>' +
+    (allDone ? '<button class="btn btn-final" data-action="go-final">🏆 Ver mi resultado final</button>' : '') +
+    '<button class="btn btn-secondary" data-action="go-lobby">← Volver al inicio</button></div>';
+}
+
+function renderIntro(){
+  var g = GAMES[state.gameIndex];
+  var how = '';
+  if(g.type==='clicker'){
+    var verbo = g.id==='phishing' ? 'phishing' : g.id==='malware' ? 'peligrosos' : 'estafa';
+    how = 'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son <b>'+verbo+'</b>. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa <b>Finalizar y ver resultado</b>.';
+  } else if(g.type==='quiz'){ how = 'Lee cada pregunta con calma y elige la opción correcta entre <b>A, B o C</b>. <b>Las opciones se barajan en cada partida</b>.'; }
+  else if(g.type==='password'){ how = 'Escribe una contraseña que creas que es segura y pulsa <b>Analizar con IA</b>. La IA simula <b>4 escenarios de ataque reales</b> (fuerza bruta, diccionario, híbrido y Argon2id) usando velocidades medidas de hashcat en GPU.<br><br>🔒 <b style="color:var(--amber)">No uses contraseñas personales reales a menos que quieras comprobar su seguridad.</b><br><br>Puedes probar varias contraseñas seguidas. Al finalizar se guardará tu <b>mejor resultado</b> (máx. 200 pts).'; }
+  else { how = 'Vas a ver <b>'+g.data.length+' escenarios reales</b> de dificultad creciente. En cada uno, activa los interruptores que correspondan a <b>buenas prácticas de seguridad</b> y deja desactivados los que sean <b>malas prácticas</b>.<br><br>⚠️ <b style="color:var(--amber)">¡Cuidado con las trampas!</b> Algunas opciones suenan a buena práctica (mejorar velocidad, conectar fácil) pero son <b>malas ideas de seguridad</b>.<br><br>✅ Al comprobar, <b>te explicaremos por qué cada respuesta es correcta o incorrecta</b>. <b>El orden se baraja en cada partida</b>.'; }
+  var warn = '';
+  if(state.results[g.id]){
+    warn = '<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:12px 14px;margin:14px 0;font-size:.82rem;color:#fcd77a;line-height:1.6;text-align:center">⚠️ <b>Ya has jugado a este minijuego.</b> Al empezar de nuevo, tus <b>'+state.results[g.id].pts+' pts anteriores se descontarán</b> y solo contará la nueva puntuación.</div>';
+  }
+  stage.innerHTML = '<div class="panel" style="--tc:'+g.color+'">' +
+    '<div style="text-align:center;font-size:3.5rem;margin-bottom:10px">'+g.icon+'</div>' +
+    '<h2 class="title" style="color:'+g.color+';font-size:1.6rem">'+g.name+'</h2>' +
+    '<p class="subtitle" style="color:'+g.color+';font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.7rem">Máximo: '+g.max+' pts</p>' +
+    '<div style="background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:14px;padding:18px;margin:22px 0;font-size:.9rem;line-height:1.7;color:#cdd9ea;text-align:center">'+how+'</div>' +
+    warn +
+    '<button class="btn btn-primary" data-action="start-game">🎮 ¡Jugar!</button>' +
+    '<button class="btn btn-secondary" data-action="go-select">← Cambiar de minijuego</button></div>';
+}
+
+function renderGame(){
+  var g = GAMES[state.gameIndex];
+  if(g.type==='clicker') return renderClicker();
+  if(g.type==='quiz') return renderQuiz();
+  if(g.type==='config') return renderConfig();
+  if(g.type==='password') return renderPassword();
+}
+
+function renderClicker(){
+  var g = GAMES[state.gameIndex];
+  var isMalware = g.id === 'malware';
+  var isPhishing = g.id === 'phishing';
+  var isSocial = g.id === 'ingSocial';
+  var colsClass = g.layout==='cols-3' ? 'cols-3' : g.layout==='cols-4' ? 'cols-4' : 'cols-2';
+  var markedCount = state.items.filter(function(x){return x.marked;}).length;
+  var itemsHTML = '';
+  var arenaHTML = '';
+
+  if (isPhishing) {
+    itemsHTML = state.items.map(function(it,i){
+      var cls = 'email-card';
+      if(it.marked) cls += ' marked';
+      if(state.ended) cls += ' locked';
+      var initial = it.senderName ? it.senderName.charAt(0).toUpperCase() : '?';
+      var attachHTML = it.attachment ? '<span class="email-badge attach">📎 '+escHTML(it.attachment)+'</span>' : '';
+      var priorityHTML = it.priority==='urgent' ? '<span class="email-badge priority">⚡ URGENTE</span>' : '';
+      return '<button class="'+cls+'" data-action="click-item" data-val="'+i+'">' +
+        '<div class="email-header">' +
+          '<div class="email-avatar">'+escHTML(initial)+'</div>' +
+          '<div class="email-info">' +
+            '<div class="email-sender-name">'+escHTML(it.senderName)+'</div>' +
+            '<div class="email-sender-addr">'+escHTML(it.from)+'</div>' +
+          '</div>' +
+          '<div class="email-meta">' +
+            '<div class="email-time">'+escHTML(it.time)+'</div>' +
+            priorityHTML + attachHTML +
+          '</div>' +
+        '</div>' +
+        '<div class="email-subject-line"><div class="email-unread-dot"></div>' +
+          '<div class="email-subject">'+escHTML(it.subject)+'</div>' +
+        '</div>' +
+        '<div class="email-body">'+escHTML(it.body)+'</div>' +
+      '</button>';
+    }).join('');
+    arenaHTML = '<div class="email-inbox">' +
+      '<div class="email-inbox-bar">' +
+        '<div class="email-inbox-title">📥 Bandeja de entrada</div>' +
+        '<div class="email-inbox-count">'+markedCount+'/'+state.items.length+' marcados</div>' +
+      '</div>' +
+      '<div class="email-list">'+itemsHTML+'</div>' +
+    '</div>';
+  } else if (isSocial) {
+    itemsHTML = state.items.map(function(it,i){
+      var cls = 'sc-card ' + (it.platform || 'email');
+      if(it.marked) cls += ' marked';
+      if(state.ended) cls += ' locked';
+      return '<button class="'+cls+'" data-action="click-item" data-val="'+i+'">' +
+        '<div class="sc-head">' +
+          '<div class="sc-avatar">'+escHTML(it.icon)+'</div>' +
+          '<div class="sc-info">' +
+            '<div class="sc-sender">'+escHTML(it.sender)+'</div>' +
+            '<div class="sc-platform">'+escHTML(it.platformName)+'</div>' +
+          '</div>' +
+          '<div class="sc-time">'+escHTML(it.time)+'</div>' +
+        '</div>' +
+        '<div class="sc-bubble">'+escHTML(it.message)+'</div>' +
+      '</button>';
+    }).join('');
+    arenaHTML = '<div class="sc-grid">'+itemsHTML+'</div>';
+  } else {
+    itemsHTML = state.items.map(function(it,i){
+      var cls = 'click-item';
+      if(it.marked) cls += ' marked';
+      if(state.ended) cls += ' locked';
+      var inner = '';
+      if(g.itemKind==='file'){
+        cls += ' file-item';
+        var ext = getExt(it.name);
+        inner = '<div class="file-icon-wrap"><span class="file-icon">'+it.icon+'</span></div>' +
+                '<div class="file-name">'+escHTML(it.name)+'</div>' +
+                '<div class="file-ext-badge">'+escHTML(ext)+'</div>';
+      }
+      return '<button class="'+cls+'" data-action="click-item" data-val="'+i+'">'+inner+'</button>';
+    }).join('');
+
+    if(isMalware){
+      arenaHTML = '<div class="file-explorer">' +
+        '<div class="file-explorer-bar">' +
+          '<div class="fe-dots"><span></span><span></span><span></span></div>' +
+          '<div class="fe-path">📁 Mis descargas / Archivos recibidos</div>' +
+          '<div class="fe-count">'+markedCount+'/'+state.items.length+'</div>' +
+        '</div>' +
+        '<div class="fe-legend">' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.exe</span> programa</div>' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.xlsm</span> macros</div>' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.pdf</span> documento</div>' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.jpg</span> imagen</div>' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.mp3</span> audio</div>' +
+          '<div class="fe-legend-item"><span class="fe-legend-badge">.mp4</span> vídeo</div>' +
+        '</div>' +
+        '<div class="clicker-grid '+colsClass+'">'+itemsHTML+'</div>' +
+      '</div>';
+    } else {
+      arenaHTML = '<div class="clicker-grid '+colsClass+'">'+itemsHTML+'</div>';
+    }
+  }
+
+  var hint;
+  if(isMalware){
+    hint = '📁 Estás revisando tu carpeta de descargas. Marca los archivos que <b>NO abrirías bajo ningún concepto</b>. Fíjate en el <b>nombre completo</b>, la <b>extensión</b> y su <b>origen</b>.';
+  } else if(isPhishing){
+    hint = '📧 Estás revisando tu bandeja de entrada. Marca los correos que creas que son <b>PHISHING</b>. Mira con calma: la <b>dirección real del remitente</b>, la <b>hora</b>, si tiene prioridad urgente y si adjunta archivos raros.';
+  } else {
+    hint = '🧠 Marca los mensajes que creas que son <b>ESTAFA</b>. Fíjate en quién envía, la urgencia, si piden dinero o datos raros.';
+  }
+
+  stage.innerHTML = '<div class="panel" style="--tc:'+g.color+'">' +
+    '<div class="game-header">' +
+      '<div class="game-title">'+g.icon+' '+g.name+'</div>' +
+      '<div class="game-info"><div class="badge">Marcados <b>'+markedCount+'</b></div></div>' +
+    '</div>' +
+    '<div class="task-banner">'+hint+'</div>' +
+    arenaHTML +
+    '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>' +
+  '</div>';
+}
+
+function handleClickItem(idx){
+  if(state.ended) return;
+  var it = state.items[idx];
+  if(!it) return;
+  it.marked = !it.marked;
+  render();
+}
+
+function renderQuiz(){
+  var g = GAMES[state.gameIndex];
+  var total = g.data.length;
+  if(state.quizIndex >= total){ return finishGame(); }
+  var q = state.quizShuffled[state.quizIndex];
+  var answered = state.quizSelected !== -1;
+  var pct = ((state.quizIndex + (answered?1:0)) / total) * 100;
+  var catIcon = q.icon || '🔐';
+
+  var optsHTML = q.options.map(function(opt,i){
+    var cls = 'quiz-option';
+    if(answered){
+      if(i === q.correct) cls += ' correct';
+      else if(i === state.quizSelected) cls += ' wrong';
+    }
+    var letter = String.fromCharCode(65 + i);
+    return '<button class="'+cls+'" '+(answered?'disabled':'')+' data-action="quiz-answer" data-val="'+i+'">' +
+      '<span class="qo-letter">'+letter+'</span>' +
+      '<span class="qo-text">'+escHTML(opt)+'</span>' +
+    '</button>';
+  }).join('');
+
+  var bottom = '';
+  if(answered){
+    var ok = state.quizSelected === q.correct;
+    bottom = '<div class="quiz-feedback '+(ok?'good':'bad')+'">' +
+      '<div class="qf-head">'+(ok?'✅ ¡Correcto!':'❌ Incorrecto')+' · La respuesta correcta era la <b>' + String.fromCharCode(65 + q.correct) + '</b></div>' +
+      '<div class="qf-body">' + q.why + '</div>' +
+    '</div>' +
+    '<button class="btn btn-primary" style="margin-top:14px" data-action="quiz-next">' +
+      (state.quizIndex < total-1 ? 'Siguiente pregunta →' : 'Terminar juego') +
+    '</button>' +
+    '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
+  } else {
+    // Si quedan preguntas sin responder, pedir confirmación
+    var pending = total - state.quizIndex;
+    var confirmMsg = 'Quedan ' + pending + ' pregunta(s) sin responder. ¿Seguro que quieres finalizar? Las preguntas no respondidas contarán como fallo.';
+    bottom = '<button class="btn btn-finish" data-action="finish-quiz-confirm" data-pending="'+pending+'">🏁 Finalizar y ver resultado</button>';
+  }
+
+  stage.innerHTML = '<div class="panel" style="--tc:'+g.color+'">' +
+    '<div class="game-header"><div class="game-title">'+g.icon+' '+g.name+'</div>' +
+    '<div class="game-info"><div class="badge">Aciertos <b style="color:var(--green)">'+state.sessionOk+'</b></div>' +
+    '<div class="badge">Fallos <b style="color:var(--red)">'+state.sessionKo+'</b></div></div></div>' +
+    '<div class="quiz-stage">' +
+      '<div class="quiz-topbar">' +
+        '<div class="quiz-topbar-left">' +
+          '<div class="quiz-cat-icon">'+catIcon+'</div>' +
+          '<div class="quiz-cat-name">'+escHTML(q.tag)+'</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+          '<div class="quiz-shuffled-badge">🔄 Barajado</div>' +
+          '<div class="quiz-progress-badge">'+(state.quizIndex+1)+' / '+total+'</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="quiz-progressbar"><div class="quiz-progressfill" style="width:'+pct+'%"></div></div>' +
+      '<div class="quiz-card">' +
+        '<div class="quiz-card-icon">'+catIcon+'</div>' +
+        '<div class="quiz-card-question">'+escHTML(q.question)+'</div>' +
+      '</div>' +
+      '<div class="quiz-options">'+optsHTML+'</div>' +
+      bottom +
+    '</div>' +
+  '</div>';
+}
+
+function handleQuizAnswer(idx){
+  if(state.quizSelected !== -1) return;
+  var q = state.quizShuffled[state.quizIndex];
+  state.quizSelected = idx;
+  var ok = (idx === q.correct);
+  if(ok){ state.sessionScore += 20; state.sessionOk++; toast('+20','good'); }
+  else  { state.sessionScore -= 10; state.sessionKo++; toast('−10','bad'); }
+  var userLetter    = String.fromCharCode(65 + idx);
+  var correctLetter = String.fromCharCode(65 + q.correct);
+  state.review.push({
+    head: 'Pregunta ' + (state.quizIndex+1) + ': ' + q.question,
+    ok: ok,
+    userDid: 'Elegiste ' + userLetter,
+    userBadge: 'selected',
+    why: q.why,
+    correctAction: ok ? null : 'La correcta era ' + correctLetter + ': ' + q.options[q.correct],
+    qIndex: state.quizIndex
+  });
+  render();
+}
+function handleQuizNext(){
+  var g = GAMES[state.gameIndex];
+  state.quizIndex++;
+  state.quizSelected = -1;
+  if(state.quizIndex >= g.data.length){ return finishGame(); }
+  render();
+}
+
+function renderConfig(){
+  var g = GAMES[state.gameIndex];
+  var total = g.data.length;
+  if(state.configIndex >= total){ return finishGame(); }
+  var s = state.configShuffled[state.configIndex];
+
+  if(!state.configTogglesInitialized || state.configTogglesForIndex !== state.configIndex){
+    state.configToggles = s.toggles.map(function(t){ return { on:false }; });
+    state.configChecked = false;
+    state.configTogglesInitialized = true;
+    state.configTogglesForIndex = state.configIndex;
+  }
+
+  var togglesHTML = s.toggles.map(function(t,i){
+    var userOn = state.configToggles[i].on;
+    var cls = 'net-toggle';
+    if(userOn) cls += ' on';
+    if(state.configChecked) cls += ' locked';
+    if(state.configChecked){
+      var isCorrect = (userOn === t.correct);
+      cls += isCorrect ? ' correct-locked' : ' wrong-locked';
+    }
+    var attr = state.configChecked ? '' : ' data-action="config-toggle" data-val="'+i+'"';
+    var feedbackIcon = state.configChecked ? '<span class="net-toggle-feedback">' + (userOn === t.correct ? '✓' : '✗') + '</span>' : '';
+    return '<button class="'+cls+'"'+attr+'>' +
+      '<div class="net-toggle-icon">'+escHTML(t.icon || '🔧')+'</div>' +
+      '<div class="net-toggle-text">' +
+        '<div class="net-toggle-label">'+escHTML(t.label)+'</div>' +
+        '<div class="net-toggle-sub">'+escHTML(t.sub)+'</div>' +
+      '</div>' +
+      '<div class="net-toggle-status">'+(userOn?'ACTIVADO':'DESACTIVADO')+'</div>' +
+      feedbackIcon +
+    '</button>';
+  }).join('');
+
+  var activeCount = state.configToggles.filter(function(t){return t.on;}).length;
+  var totalToggles = s.toggles.length;
+  var pct = (activeCount / totalToggles) * 100;
+
+  var bottom = '';
+  if(state.configChecked){
+    var okCount = 0;
+    var allRows = '';
+    s.toggles.forEach(function(t,i){
+      var userOn = state.configToggles[i].on;
+      var isCorrect = (userOn === t.correct);
+      var userDesc = userOn ? 'Activaste' : 'Dejaste desactivado';
+      var correctDesc = t.correct ? 'debería estar ACTIVADO' : 'debería estar DESACTIVADO';
+      var whyText = t.why || 'Esta opción es ' + (t.correct ? 'buena práctica' : 'mala práctica') + ' de seguridad.';
+      if(isCorrect){
+        okCount++;
+        allRows += '<div class="te-row good">' +
+          '<div class="te-head">✓ ' + escHTML(t.label) + '</div>' +
+          '<div class="te-body"><b>' + userDesc + '</b> y era lo correcto. ' + escHTML(whyText) + '</div>' +
+        '</div>';
+      } else {
+        allRows += '<div class="te-row bad">' +
+          '<div class="te-head">✗ ' + escHTML(t.label) + '</div>' +
+          '<div class="te-body"><b>' + userDesc + '</b>, pero <b>' + correctDesc + '</b>.<br>' + escHTML(whyText) + '</div>' +
+        '</div>';
+      }
+    });
+    var perfect = (okCount === totalToggles);
+    var pts = perfect ? 50 : okCount * 10;
+
+    var feedbackHTML = '<div class="feedback ' + (perfect?'good':'bad') + '">' +
+      '<b>' + (perfect ? '🎯 ¡Escenario perfecto! +50 pts' : 'Ajustes correctos: ' + okCount + '/' + totalToggles + ' · +' + pts + ' pts') + '</b>' +
+    '</div>';
+
+    feedbackHTML += '<div class="te-list">' +
+      '<div style="font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--muted);margin:8px 0 4px">📚 EXPLICACIÓN DE TUS RESPUESTAS</div>' +
+      allRows +
+    '</div>';
+
+    bottom = feedbackHTML +
+      '<button class="btn btn-primary" style="margin-top:14px" data-action="config-next">' +
+      (state.configIndex < total-1 ? 'Siguiente escenario →' : 'Terminar juego')+'</button>' +
+      '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
+  } else {
+    bottom = '<button class="btn btn-primary" data-action="config-check">Comprobar configuración</button>' +
+             '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
+  }
+
+  var trapBadge = s.traps ? '<div class="net-trap-badge">⚠️ '+s.traps+' trampa'+(s.traps>1?'s':'')+'</div>' : '';
+
+  stage.innerHTML = '<div class="panel" style="--tc:'+g.color+'">' +
+    '<div class="game-header"><div class="game-title">'+g.icon+' '+g.name+'</div>' +
+    '<div class="game-info"><div class="badge">Escenario <b>'+(state.configIndex+1)+'/'+total+'</b></div>' +
+    '<div class="badge">Aciertos <b style="color:var(--green)">'+state.sessionOk+'</b></div>' +
+    '<div class="badge">Fallos <b style="color:var(--red)">'+state.sessionKo+'</b></div></div></div>' +
+    '<div class="net-game">' +
+      '<div class="net-hero">' +
+        '<div class="net-hero-icon">'+(s.icon || '📶')+'</div>' +
+        '<div class="net-hero-text">' +
+          '<div class="net-hero-level">'+escHTML(s.level || '')+'</div>' +
+          '<div class="net-hero-title">'+escHTML(s.title)+'</div>' +
+          '<div class="net-hero-desc">'+escHTML(s.desc)+'</div>' +
+          '<div class="net-hero-badges">' +
+            '<div class="net-count-badge">🛡️ '+activeCount+' de '+totalToggles+' activadas</div>' +
+            trapBadge +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="net-toggles">'+togglesHTML+'</div>' +
+      '<div class="net-meter">' +
+        '<div class="net-meter-label"><span>Ajustes activados</span><b>'+activeCount+'/'+totalToggles+'</b></div>' +
+        '<div class="net-meter-bar"><div class="net-meter-fill" style="width:'+pct+'%"></div></div>' +
+      '</div>' +
+    '</div>' + bottom + '</div>';
+}
+
+function handleConfigToggle(idx){
+  if(state.configChecked) return;
+  var t = state.configToggles[idx];
+  if(!t) return;
+  t.on = !t.on;
+  render();
+}
+function handleConfigCheck(){
+  if(state.configChecked) return;
+  state.configChecked = true;
+  var s = state.configShuffled[state.configIndex];
+  var okCount = 0;
+  for(var i=0;i<state.configToggles.length;i++){
+    if(state.configToggles[i].on === s.toggles[i].correct) okCount++;
+  }
+  var perfect = (okCount === s.toggles.length);
+  var pts = perfect ? 50 : okCount * 10;
+  state.sessionScore += pts;
+  state.sessionOk += okCount;
+  state.sessionKo += (s.toggles.length - okCount);
+  toast((pts>=0?'+':'')+pts, perfect?'good':'bad');
+
+  for(var j=0;j<s.toggles.length;j++){
+    var t = s.toggles[j];
+    var userOn = state.configToggles[j].on;
+    var isCorrect = (userOn === t.correct);
+    state.review.push({
+      head: 'Esc. ' + (state.configIndex+1) + ' · ' + t.label,
+      ok: isCorrect,
+      userDid: userOn ? 'Activaste' : 'Dejaste desactivado',
+      userBadge: userOn ? 'selected' : 'unselected',
+      why: t.why,
+      correctAction: isCorrect ? null : (t.correct ? 'Debería estar ACTIVADO' : 'Debería estar DESACTIVADO')
+    });
+  }
+  render();
+}
+function handleConfigNext(){
+  var g = GAMES[state.gameIndex];
+  state.configIndex++;
+  state.configToggles = [];
+  state.configChecked = false;
+  state.configTogglesInitialized = false;
+  state.configTogglesForIndex = -1;
+  if(state.configIndex >= g.data.length){ return finishGame(); }
+  render();
+}
+
+/* ============================================================
+   MINIJUEGO CONTRASEÑAS — RENDER
+   ============================================================ */
+
+function renderPassword(){
+  var g = GAMES[state.gameIndex];
+  var phase = state.passwordPhase || 'input';
+
+  var inner = '';
+
+  if(phase === 'input'){
+    var hasBest = state.passwordBestScore > 0;
+    var bestLabel = hasBest
+      ? '<div style="text-align:center;font-size:.82rem;color:var(--green);font-weight:900">🏆 Tu mejor resultado hasta ahora: ' + state.passwordBestScore + ' / 200</div>'
+      : '';
+
+    inner =
+      '<div class="pwd-privacy-banner">' +
+        '<span class="lock">🔒</span><b>Aviso de privacidad:</b> la IA analiza tu contraseña <b>en memoria y la olvida al instante</b>. No se guarda ni se envía a ningún servidor. Puedes probar cualquier contraseña, pero <b>no uses contraseñas personales reales a menos que quieras comprobar su seguridad</b>.' +
+      '</div>' +
+      bestLabel +
+      '<div class="pwd-input-wrap">' +
+        '<input type="password" id="pwd-input-field" class="pwd-input" placeholder="Escribe tu contraseña..." autocomplete="off" spellcheck="false" maxlength="128">' +
+        '<button class="pwd-toggle-vis" data-action="pwd-toggle-vis" title="Mostrar/ocultar">👁️</button>' +
+      '</div>' +
+      '<div class="pwd-charcount"><span>🔐 Longitud</span><span class="cnt" id="pwd-char-counter">0 caracteres</span></div>' +
+      '<button class="btn btn-primary" data-action="pwd-analyze">🤖 Analizar con IA</button>' +
+      '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
+  } else if(phase === 'analyzing'){
+    inner =
+      '<div class="pwd-analyzing">' +
+        '<div class="pwd-spinner"></div>' +
+        '<div class="pwd-analyzing-text">🤖 La IA está analizando tu contraseña...</div>' +
+        '<div class="pwd-analyzing-sub">Simulando 4 escenarios de ataque con velocidades reales de hashcat</div>' +
+      '</div>';
+  } else if(phase === 'result'){
+    var r = state.passwordResult;
+    if(!r){ state.passwordPhase = 'input'; return renderPassword(); }
+    var lvl = classifyPasswordStrength(r.score);
+    var pct = (r.score / 200) * 100;
+
+    var strengthsHTML = r.strengths.map(function(s){
+      return '<div class="pwd-finding ok"><span class="fi">✅</span><span class="ft">' + escHTML(s) + '</span></div>';
+    }).join('');
+
+    var weaknessesHTML = r.weaknesses.map(function(s){
+      return '<div class="pwd-finding ko"><span class="fi">❌</span><span class="ft">' + escHTML(s) + '</span></div>';
+    }).join('');
+
+    var recsHTML = r.recommendations.map(function(s){
+      return '<div class="pwd-finding tip"><span class="fi">💡</span><span class="ft">' + escHTML(s) + '</span></div>';
+    }).join('');
+
+    var crackRowsHTML = r.crackScenarios.map(function(sc){
+      return '<div class="pwd-crack-row"><span class="cl">' + escHTML(sc.name) + '</span><span class="cr">' + escHTML(sc.formatted) + '</span></div>';
+    }).join('');
+
+    inner =
+      '<div class="pwd-score-hero">' +
+        '<div class="pwd-score-big">' + r.score + '</div>' +
+        '<div class="pwd-score-max">/ 200 puntos</div>' +
+        '<div class="pwd-level-badge" style="color:' + lvl.color + ';border-color:' + lvl.color + ';background:' + lvl.bg + '">' + lvl.label + '</div>' +
+      '</div>' +
+      '<div class="pwd-meter">' +
+        '<div class="pwd-meter-label"><span>Seguridad</span><span>' + r.score + '/200</span></div>' +
+        '<div class="pwd-meter-bar"><div class="pwd-meter-fill" style="width:' + pct + '%;background:' + lvl.color + '"></div></div>' +
+      '</div>' +
+      '<div class="pwd-cracktime">⏱️ Peor escenario realista: <b>' + escHTML(r.primaryCrackTime) + '</b></div>' +
+      '<div class="pwd-crack-scenarios">' +
+        '<div class="pwd-findings-head">🎯 ESCENARIOS DE ATAQUE (hashcat real)</div>' +
+        crackRowsHTML +
+      '</div>' +
+      '<div class="pwd-findings">' +
+        (strengthsHTML ? '<div class="pwd-findings-head">✅ PUNTOS FUERTES</div>' + strengthsHTML : '') +
+        (weaknessesHTML ? '<div class="pwd-findings-head">❌ PUNTOS DÉBILES</div>' + weaknessesHTML : '') +
+        (recsHTML ? '<div class="pwd-findings-head">💡 RECOMENDACIONES</div>' + recsHTML : '') +
+      '</div>' +
+      '<div class="pwd-forgot">🔒 <b>Contraseña olvidada.</b> La IA ya no recuerda lo que escribiste.</div>' +
+      '<button class="btn btn-primary" style="margin-top:14px" data-action="pwd-retry">🔐 Probar otra contraseña</button>' +
+      '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
+  }
+
+  var bestBadge = state.passwordBestScore > 0
+    ? '<div class="badge">Mejor <b style="color:var(--green)">' + state.passwordBestScore + '/200</b></div>'
+    : '';
+
+  stage.innerHTML =
+    '<div class="panel" style="--tc:' + g.color + '">' +
+      '<div class="game-header">' +
+        '<div class="game-title">' + g.icon + ' ' + g.name + '</div>' +
+        '<div class="game-info"><div class="badge">Máximo <b>200 pts</b></div>' + bestBadge + '</div>' +
+      '</div>' +
+      '<div class="pwd-create-wrap">' + inner + '</div>' +
+    '</div>';
+}
+
+function handlePasswordAnalyze(){
+  var inp = document.getElementById('pwd-input-field');
+  var val = inp ? inp.value : '';
+  if(!val || val.length === 0){
+    toast('Escribe una contraseña primero', 'bad');
+    return;
+  }
+  state.passwordInput = val;
+  if(inp) inp.value = '';
+
+  state.passwordPhase = 'analyzing';
+  render();
+
+  setTimeout(function(){
+    var result = analyzePassword(state.passwordInput);
+    state.passwordInput = '';
+    state.passwordResult = result;
+    if(result.score > state.passwordBestScore){
+      state.passwordBestScore = result.score;
+      state.passwordBestResult = result;
+    }
+    state.passwordPhase = 'result';
+    render();
+  }, 1800);
+}
+
+function handlePasswordToggleVis(){
+  var inp = document.getElementById('pwd-input-field');
+  if(!inp) return;
+  inp.type = (inp.type === 'password') ? 'text' : 'password';
+}
+
+function handlePasswordRetry(){
+  state.passwordPhase = 'input';
+  state.passwordResult = null;
+  render();
+}
+
+/* ============================================================
+   FINALIZAR Y RENDER DE RESULTADO
+   ============================================================ */
+
+function finishGame(){
+  if(state.ended) return;
+  state.ended = true;
+  var g = GAMES[state.gameIndex];
+
+  if(g.type==='clicker'){
+    var ok=0, ko=0, pts=0;
+    var review = [];
+    state.items.forEach(function(it){
+      var rightDecision = (it.isBad === it.marked);
+      var title = '';
+      if(g.itemKind==='email') title = it.senderName + ' — ' + it.subject;
+      else if(g.itemKind==='file') title = it.name;
+      else if(g.itemKind==='message') title = (it.platformName || 'Mensaje') + ': ' + (it.message.substring(0,50)) + (it.message.length>50?'...':'');
+      if(rightDecision){ ok++; pts += 20; }
+      else { ko++; pts -= 10; }
+      review.push({
+        head: title,
+        ok: rightDecision,
+        userDid: it.marked ? 'Marcaste' : 'No marcaste',
+        userBadge: it.marked ? 'selected' : 'unselected',
+        why: it.why,
+        correctAction: rightDecision ? null : (it.isBad ? 'Deberías haberlo marcado' : 'No debías marcarlo')
+      });
+    });
+    state.sessionOk = ok; state.sessionKo = ko; state.sessionScore = pts; state.review = review;
+  }
+
+  if(g.type==='quiz'){
+    var fullReview = [];
+    for(var qi=0; qi<state.quizShuffled.length; qi++){
+      var q = state.quizShuffled[qi];
+      var existing = state.review.filter(function(r){ return r.qIndex === qi; })[0];
+      if(existing){
+        fullReview.push(existing);
+      } else {
+        var correctLetter = String.fromCharCode(65 + q.correct);
+        fullReview.push({
+          head: 'Pregunta ' + (qi+1) + ': ' + q.question,
+          ok: false,
+          userDid: 'No respondiste',
+          userBadge: 'unanswered',
+          why: q.why,
+          correctAction: 'La correcta era ' + correctLetter + ': ' + q.options[q.correct],
+          qIndex: qi
+        });
+      }
+    }
+    state.review = fullReview;
+  }
+
+  if(g.type==='password'){
+    var best = state.passwordBestResult;
+    if(best){
+      state.sessionScore = best.score;
+      state.sessionOk = best.strengths.length;
+      state.sessionKo = best.weaknesses.length;
+      var lvl = classifyPasswordStrength(best.score);
+      state.review = [{
+        head: 'Contraseña analizada · Nivel ' + lvl.label,
+        ok: best.score >= 130,
+        userDid: 'Puntuación: ' + best.score + ' / 200',
+        userBadge: 'selected',
+        why: 'Peor escenario realista: <b>' + escHTML(best.primaryCrackTime) + '</b>.<br>Fortalezas detectadas: ' + best.strengths.length + ' · Debilidades detectadas: ' + best.weaknesses.length + '.',
+        correctAction: best.score < 130 ? 'Para superar el reto, busca 130+ pts' : null
+      }];
+    } else {
+      state.sessionScore = 0;
+      state.sessionOk = 0;
+      state.sessionKo = 1;
+      state.review = [{
+        head: 'No analizaste ninguna contraseña',
+        ok: false,
+        userDid: 'Sin datos',
+        userBadge: 'unanswered',
+        why: 'Para puntuar en este minijuego, escribe una contraseña y pulsa "Analizar con IA".',
+        correctAction: null
+      }];
+    }
+    state.passwordInput = '';
+    state.passwordResult = null;
+    state.passwordBestResult = null;
+    state.passwordBestScore = 0;
+    state.passwordPhase = 'input';
+  }
+
+  state.results[g.id] = { ok: state.sessionOk, ko: state.sessionKo, pts: state.sessionScore, max: g.max };
+  state.score = GAMES.reduce(function(sum, gm){
+    var r = state.results[gm.id];
+    return sum + (r ? r.pts : 0);
+  }, 0);
+  state.done[g.id] = true;
+  saveState();
+  state.screen = 'end';
+  render();
+}
+
+function renderReviewItem(r){
+  var okCls = r.ok ? 'good' : 'bad';
+  var userBadgeCls = r.userBadge === 'selected' ? 'sel-on' :
+                     r.userBadge === 'unanswered' ? 'sel-none' : 'sel-off';
+  return '<div class="review-item ' + okCls + '">' +
+    '<div class="ri-head">' + (r.ok ? '✅ ' : '❌ ') + escHTML(r.head) + '</div>' +
+    '<div class="ri-badges">' +
+      '<span class="ri-badge ' + userBadgeCls + '">👤 ' + escHTML(r.userDid) + '</span>' +
+      '<span class="ri-badge ' + (r.ok ? 'ri-ok' : 'ri-ko') + '">' + (r.ok ? '✓ Correcto' : '✗ Incorrecto') + '</span>' +
+      (r.correctAction ? '<span class="ri-badge ri-correct">' + escHTML(r.correctAction) + '</span>' : '') +
+    '</div>' +
+    '<div class="ri-body">' + r.why + '</div>' +
+  '</div>';
+}
+
+function renderEnd(){
+  var g = GAMES[state.gameIndex];
+  var total = state.sessionOk + state.sessionKo;
+  var acc = total ? Math.round((state.sessionOk/total)*100) : 0;
+  var stars = acc>=80 ? 3 : acc>=50 ? 2 : 1;
+  var starsHTML = '';
+  for(var i=0;i<3;i++) starsHTML += i<stars ? '★' : '<span style="opacity:.2">★</span>';
+  var allDone = Object.keys(state.done).length >= GAMES.length;
+  var rank = '🌱 Sigue practicando';
+  if(acc>=80) rank = '🥇 ¡Excelente! Dominas el tema';
+  else if(acc>=50) rank = '🥈 Buen trabajo, repasa lo fallado';
+
+  var okReview = state.review.filter(function(r){return r.ok;}).length;
+  var koReview = state.review.length - okReview;
+
+  var reviewHTML = '';
+  if(state.review.length){
+    reviewHTML = '<div style="margin-top:18px">' +
+      '<div class="review-section-head">📋 REVISIÓN COMPLETA · ' + okReview + ' correctas · ' + koReview + ' incorrectas</div>' +
+      '<div class="review-list">' + state.review.map(renderReviewItem).join('') + '</div></div>';
+  } else {
+    reviewHTML = '<div class="feedback good" style="margin-top:16px"><b>🎯 No hay elementos que revisar.</b></div>';
+  }
+
+  var finalBtn = allDone ? '<button class="btn btn-final" data-action="go-final">🏆 Ver mi resultado final</button>' : '';
+
+  stage.innerHTML = '<div class="panel" style="--tc:'+g.color+'">' +
+    '<div class="end-hero"><div class="big-emoji">'+(acc>=80?'🏆':acc>=50?'👍':'💪')+'</div>' +
+    '<div style="font-size:1.4rem;letter-spacing:6px;margin-top:6px;color:var(--amber)">'+starsHTML+'</div></div>' +
+    '<h2 class="title" style="color:'+g.color+';font-size:1.4rem">¡'+g.name+' completado!</h2>' +
+    '<p class="subtitle">'+rank+'</p>' +
+    '<div class="end-stats">' +
+      '<div class="end-stat"><span class="n g">'+state.sessionOk+'</span><span class="t">ACIERTOS</span></div>' +
+      '<div class="end-stat"><span class="n r">'+state.sessionKo+'</span><span class="t">FALLOS</span></div>' +
+      '<div class="end-stat"><span class="n" style="color:var(--cyan)">'+acc+'%</span><span class="t">PRECISIÓN</span></div>' +
+      '<div class="end-stat"><span class="n" style="color:'+(state.sessionScore>=0?'var(--green)':'var(--red)')+'">'+(state.sessionScore>=0?'+':'')+state.sessionScore+'</span><span class="t">PTS DEL JUEGO</span></div>' +
+    '</div>' + reviewHTML + finalBtn +
+    '<button class="btn btn-primary" style="margin-top:16px" data-action="go-select">🎮 Elegir otro minijuego</button>' +
+    '<button class="btn btn-secondary" data-action="replay">🔄 Repetir este juego</button></div>';
+}
+
+function generateAIAnalysis(){
+  var data = GAMES.map(function(g){
+    var r = state.results[g.id];
+    if(!r) return null;
+    var t = r.ok + r.ko;
+    var acc = t ? Math.round((r.ok/t)*100) : 0;
+    return { id:g.id, name:g.name, acc:acc };
+  }).filter(function(x){return x;});
+  var strengths = data.filter(function(x){return x.acc >= 80;});
+  var mid = data.filter(function(x){return x.acc >= 50 && x.acc < 80;});
+  var weaknesses = data.filter(function(x){return x.acc < 50;});
+  var text = '';
+  if(strengths.length > 0 && weaknesses.length > 0){
+    text = 'Tienes un perfil de aprendiz con buen criterio en algunos temas. ';
+    text += 'Destacas especialmente en <b>' + strengths.map(function(s){return s.name;}).join(', ') + '</b>. ';
+    text += 'En cambio, los temas de <b>' + weaknesses.map(function(s){return s.name;}).join(', ') + '</b> son tus puntos débiles.';
+  } else if(strengths.length > 0 && weaknesses.length === 0){
+    text = '¡Excelente trabajo! Destacas con claridad en <b>' + strengths.map(function(s){return s.name;}).join(', ') + '</b>. ';
+    if(mid.length > 0) text += 'Aun así, no descuides <b>' + mid.map(function(s){return s.name;}).join(', ') + '</b>.';
+    else text += 'Mantienes un nivel alto en todos los temas.';
+  } else if(strengths.length === 0 && weaknesses.length > 0){
+    text = 'Todavía te queda camino por recorrer, pero eso es bueno: tienes mucho margen de mejora. ';
+    text += 'Los temas que más te cuestan son <b>' + weaknesses.map(function(s){return s.name;}).join(', ') + '</b>.';
+  } else {
+    text = 'Mantienes un nivel <b>medio y constante</b> en todos los temas. Repite los juegos fijándote en las explicaciones.';
+  }
+  return { strengths:strengths, mid:mid, weaknesses:weaknesses, text:text };
+}
+
+function renderFinal(){
+  var totalOk = 0, totalKo = 0;
+  GAMES.forEach(function(g){ var r = state.results[g.id]; if(r){ totalOk += r.ok; totalKo += r.ko; } });
+  var total = totalOk + totalKo;
+  var acc = total ? Math.round((totalOk/total)*100) : 0;
+  var scoreRatio = state.score / TOTAL_MAX;
+  var rank, rankColor;
+  if(scoreRatio >= 0.85){ rank = '🥇 Experto en ciberseguridad'; rankColor = 'var(--green)'; }
+  else if(scoreRatio >= 0.65){ rank = '🥈 Usuario concienciado'; rankColor = 'var(--cyan)'; }
+  else if(scoreRatio >= 0.45){ rank = '🥉 Aprendiz avanzado'; rankColor = 'var(--amber)'; }
+  else if(scoreRatio >= 0.25){ rank = '📘 Aprendiz en progreso'; rankColor = 'var(--violet)'; }
+  else { rank = '🌱 Necesitas repasar lo básico'; rankColor = 'var(--red)'; }
+  var analysis = generateAIAnalysis();
+  var breakdownHTML = GAMES.map(function(g){
+    var r = state.results[g.id];
+    if(!r) return '';
+    var t = r.ok + r.ko;
+    var a = t ? Math.round((r.ok/t)*100) : 0;
+    var cls = a>=80 ? 'strong' : a>=50 ? 'mid' : 'weak';
+    return '<div class="bk-card '+cls+'"><div class="bk-ico">'+g.icon+'</div><div class="bk-name">'+g.name+'</div>' +
+      '<div class="bk-score" style="color:'+(a>=80?'var(--green)':a>=50?'var(--amber)':'var(--red)')+'">'+a+'%</div>' +
+      '<div class="bk-acc">'+r.ok+' ✓ · '+r.ko+' ✗</div></div>';
+  }).join('');
+  var tipsHTML = GAMES.map(function(g){
+    var list = TIPS[g.id] || [];
+    if(!list.length) return '';
+    return '<div class="tip-block"><div class="tip-title" style="color:'+g.color+'">'+g.icon+' '+g.name+'</div>' +
+      '<ul class="tip-list">' + list.map(function(t){return '<li>'+t+'</li>';}).join('') + '</ul></div>';
+  }).join('');
+  stage.innerHTML = '<div class="panel">' +
+    '<div class="final-hero"><div class="trophy">'+(acc>=80?'🏆':acc>=50?'🎯':'📚')+'</div>' +
+    '<div class="final-score">'+state.score+'<span style="font-size:1.2rem;color:var(--muted)"> / '+TOTAL_MAX+'</span></div>' +
+    '<div class="final-lbl">PUNTUACIÓN FINAL</div></div>' +
+    '<div class="final-rank" style="border-color:'+rankColor+';color:'+rankColor+';background:rgba(255,255,255,.03)">'+rank+'</div>' +
+    '<div class="end-stats">' +
+      '<div class="end-stat"><span class="n g">'+totalOk+'</span><span class="t">ACIERTOS</span></div>' +
+      '<div class="end-stat"><span class="n r">'+totalKo+'</span><span class="t">FALLOS</span></div>' +
+      '<div class="end-stat"><span class="n" style="color:var(--cyan)">'+acc+'%</span><span class="t">PRECISIÓN</span></div>' +
+      '<div class="end-stat"><span class="n" style="color:var(--amber)">'+Object.keys(state.done).length+'/'+GAMES.length+'</span><span class="t">JUEGOS</span></div>' +
+    '</div>' +
+    '<h3 style="font-size:.72rem;font-weight:900;letter-spacing:1.8px;color:var(--muted);text-align:center;margin:22px 0 12px">📊 DESGLOSE POR TEMA</h3>' +
+    '<div class="breakdown-grid">'+breakdownHTML+'</div>' +
+    '<div class="ai-box"><div class="ai-head"><div class="ai-ico">🤖</div> ANÁLISIS PERSONALIZADO</div><div class="ai-text">'+analysis.text+'</div></div>' +
+    '<div class="tips-section"><div class="tips-head">💡 CONSEJOS PARA TU DÍA A DÍA</div>' + tipsHTML + '</div>' +
+    '<button class="btn btn-primary" style="margin-top:14px" data-action="go-lobby">🏠 Volver al inicio</button>' +
+    '<button class="btn btn-secondary" data-action="go-select">🎮 Repetir minijuegos</button></div>';
+}
+
+function startGame(idx){
+  state.gameIndex = idx;
+  state.sessionOk = 0; state.sessionKo = 0; state.sessionScore = 0;
+  state.review = []; state.ended = false;
+  state.quizIndex = 0; state.quizSelected = -1;
+  state.configIndex = 0; state.configToggles = []; state.configChecked = false;
+  state.configTogglesInitialized = false; state.configTogglesForIndex = -1;
+  state.quizShuffled = null; state.configShuffled = null;
+
+  var g = GAMES[idx];
+  if(g.type==='clicker'){
+    state.items = g.data.map(function(it){ var c = {}; for(var k in it) c[k] = it[k]; c.marked = false; return c; });
+  }
+  if(g.type==='password'){
+    state.passwordInput = '';
+    state.passwordResult = null;
+    state.passwordBestResult = null;
+    state.passwordBestScore = 0;
+    state.passwordPhase = 'input';
+  }
+  state.screen = 'intro';
+  render();
+}
+
+function startCurrentGame(){
+  var g = GAMES[state.gameIndex];
+
+  if(state.results[g.id]){
+    state.score -= state.results[g.id].pts;
+    delete state.results[g.id];
+  }
+
+  state.sessionOk = 0; state.sessionKo = 0; state.sessionScore = 0;
+  state.review = []; state.ended = false;
+  state.quizIndex = 0; state.quizSelected = -1;
+  state.configIndex = 0; state.configToggles = []; state.configChecked = false;
+  state.configTogglesInitialized = false; state.configTogglesForIndex = -1;
+
+  if(g.type==='clicker'){
+    state.items = g.data.map(function(it){ var c = {}; for(var k in it) c[k] = it[k]; c.marked = false; return c; });
+  } else if(g.type==='quiz'){
+    state.quizShuffled = g.data.map(function(q){ return shuffleQuestion(q); });
+  } else if(g.type==='config'){
+    state.configShuffled = g.data.map(function(s){
+      var shuffledToggles = shuffleArray(s.toggles);
+      return { icon:s.icon, level:s.level, title:s.title, desc:s.desc, traps:s.traps, toggles:shuffledToggles };
+    });
+  } else if(g.type==='password'){
+    state.passwordInput = '';
+    state.passwordResult = null;
+    state.passwordBestResult = null;
+    state.passwordBestScore = 0;
+    state.passwordPhase = 'input';
+  }
+  state.screen = 'game';
+  render();
+}
+
+function handleAction(action, val){
+  switch(action){
+    case 'go-lobby': state.screen = 'lobby'; render(); break;
+    case 'go-select': state.screen = 'select'; render(); break;
+    case 'go-final': state.screen = 'final'; render(); break;
+    case 'pick-game': startGame(parseInt(val,10)); break;
+    case 'start-game': startCurrentGame(); break;
+    case 'replay': startGame(state.gameIndex); break;
+    case 'click-item': handleClickItem(parseInt(val,10)); break;
+    case 'quiz-answer': handleQuizAnswer(parseInt(val,10)); break;
+    case 'quiz-next': handleQuizNext(); break;
+    case 'config-toggle': handleConfigToggle(parseInt(val,10)); break;
+    case 'config-check': handleConfigCheck(); break;
+    case 'config-next': handleConfigNext(); break;
+    case 'pwd-toggle-vis': handlePasswordToggleVis(); break;
+    case 'pwd-analyze': handlePasswordAnalyze(); break;
+    case 'pwd-retry': handlePasswordRetry(); break;
+    case 'finish-quiz-confirm':
+      var pending = parseInt(val || '0', 10);
+      if(confirm('Quedan ' + pending + ' pregunta(s) sin responder. ¿Seguro que quieres finalizar? Las preguntas no respondidas contarán como fallo.')){
+        finishGame();
+      }
+      break;
+    case 'reset-all':
+      if(confirm('¿Seguro que quieres borrar todo tu progreso guardado? Esta acción no se puede deshacer.')){
+        clearPersistedState();
+        state.score = 0;
+        state.results = {};
+        state.done = {};
+        state.screen = 'lobby';
+        render();
+        toast('Progreso reiniciado', 'good');
+      }
+      break;
+    case 'finish':
+      if(state.passwordPhase === 'analyzing'){
+        toast('Espera al análisis', 'bad');
+        return;
+      }
+      finishGame();
+      break;
+  }
+}
+
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  handleAction(btn.dataset.action, btn.dataset.val);
+});
+
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id === 'pwd-input-field'){
+    var c = document.getElementById('pwd-char-counter');
+    if(c) c.textContent = e.target.value.length + ' caracteres';
+  }
+});
+
+// Cargar estado guardado al arrancar
+loadState();
+updateHUD();
+render();
+</script>
+</body>
+</html>
