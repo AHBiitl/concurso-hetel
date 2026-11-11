@@ -103,8 +103,8 @@ module.exports = async function handler(req, res) {
         max_tokens: 300,
         response_format: { type: "json_object" },
         provider: {
-          data_collection: "deny",
-          zdr: true,
+          // data_collection: "deny",
+          // zdr: true,
           allow_fallbacks: false
         },
         messages: [
