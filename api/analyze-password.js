@@ -113,7 +113,7 @@ module.exports = async function handler(req, res) {
         provider: {
           // data_collection: "deny",
           // zdr: true,
-          allow_fallbacks: false
+          // allow_fallbacks: false
         },
         messages: [
           {
