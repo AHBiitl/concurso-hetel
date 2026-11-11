@@ -57,6 +57,14 @@ function cleanList(value, password) {
     .filter(Boolean);
 }
 
+function redactSecrets(value, secrets) {
+  let text = String(value || "");
+  for (const secret of secrets) {
+    if (secret) text = text.split(secret).join("[redactado]");
+  }
+  return text.slice(0, 300);
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store, private");
   res.setHeader("Pragma", "no-cache");
@@ -121,7 +129,25 @@ module.exports = async function handler(req, res) {
     });
 
     if (!upstream.ok) {
-      return res.status(502).json({ error: "El servicio de IA no pudo completar el análisis. Prueba más tarde." });
+      let upstreamError = "";
+      try {
+        const errorPayload = await upstream.json();
+        upstreamError = errorPayload.error && (errorPayload.error.message || errorPayload.error.code);
+      } catch {
+        upstreamError = "";
+      }
+      const safeError = redactSecrets(upstreamError, [password, apiKey]);
+      console.error("OpenRouter request failed", {
+        status: upstream.status,
+        model,
+        error: safeError || "No error message returned"
+      });
+      return res.status(502).json({
+        error: safeError
+          ? `OpenRouter respondió ${upstream.status}: ${safeError}`
+          : `OpenRouter respondió con HTTP ${upstream.status}.`,
+        upstreamStatus: upstream.status
+      });
     }
 
     const payload = await upstream.json();
@@ -149,7 +175,17 @@ module.exports = async function handler(req, res) {
         recommendations: cleanList(analysis.recommendations, password)
       }
     });
-  } catch {
-    return res.status(502).json({ error: "No se pudo conectar con el servicio de IA. Prueba más tarde." });
+  } catch (error) {
+    const safeError = redactSecrets(error && error.message, [password, apiKey]);
+    console.error("OpenRouter request error", {
+      model,
+      error: safeError || "Unknown network error"
+    });
+    return res.status(502).json({
+      error: safeError
+        ? `No se pudo completar la petición a OpenRouter: ${safeError}`
+        : "No se pudo conectar con el servicio de IA.",
+      upstreamStatus: null
+    });
   }
 };
