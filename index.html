@@ -147,9 +147,6 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 
 /* PASSWORD CREATOR */
 .pwd-create-wrap{display:flex;flex-direction:column;gap:16px}
-.pwd-privacy-banner{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));border:1px solid rgba(251,191,36,.45);border-radius:14px;padding:14px 16px;font-size:.83rem;line-height:1.65;color:#fde68a}
-.pwd-privacy-banner b{color:var(--amber)}
-.pwd-privacy-banner .lock{font-size:1.2rem;margin-right:4px}
 .pwd-input-wrap{position:relative}
 .pwd-input{width:100%;font-family:'Courier New',monospace;font-size:1.1rem;font-weight:700;color:var(--cyan);background:rgba(3,6,13,.85);border:2px solid rgba(34,211,238,.45);border-radius:14px;padding:18px 60px 18px 20px;letter-spacing:1px;transition:.2s}
 .pwd-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
@@ -157,11 +154,6 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .pwd-toggle-vis:hover{background:rgba(34,211,238,.25)}
 .pwd-charcount{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);font-weight:800;margin-top:6px;padding:0 4px}
 .pwd-charcount .cnt{color:var(--cyan);font-variant-numeric:tabular-nums}
-.pwd-analyzing{text-align:center;padding:50px 20px;background:linear-gradient(160deg,rgba(16,26,44,.9),rgba(8,16,28,.9));border:2px solid rgba(34,211,238,.35);border-radius:20px;position:relative;overflow:hidden}
-.pwd-spinner{width:70px;height:70px;border:4px solid rgba(34,211,238,.15);border-top-color:var(--cyan);border-radius:50%;margin:0 auto 20px;animation:pwdSpin 1s linear infinite}
-@keyframes pwdSpin{to{transform:rotate(360deg)}}
-.pwd-analyzing-text{font-size:1.05rem;font-weight:900;color:var(--cyan);margin-bottom:8px}
-.pwd-analyzing-sub{font-size:.82rem;color:var(--muted);font-weight:700}
 .pwd-score-hero{text-align:center;padding:20px 0;margin-bottom:16px;border-bottom:1px solid var(--line)}
 .pwd-score-big{font-size:4rem;font-weight:900;line-height:1;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
 .pwd-score-max{font-size:1.1rem;color:var(--muted);font-weight:800;margin-top:2px}
@@ -170,6 +162,14 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .pwd-meter-label{display:flex;justify-content:space-between;font-size:.75rem;font-weight:900;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
 .pwd-meter-bar{height:14px;background:#16223a;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
 .pwd-meter-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1.2)}
+.pwd-score-sequence{margin:16px 0;padding:14px;border:1px solid var(--line);border-radius:13px;background:rgba(3,6,13,.4)}
+.pwd-score-step{display:flex;align-items:center;gap:10px;padding:9px 10px;border-bottom:1px solid rgba(26,44,70,.6);font-size:.82rem;color:#cdd9ea}
+.pwd-score-step:last-of-type{border-bottom:0}
+.pwd-score-step .step-no{color:var(--cyan);font-weight:900}
+.pwd-score-step .step-label{flex:1}
+.pwd-score-step .step-value{font-weight:900;color:var(--cyan);white-space:nowrap}
+.pwd-score-total{text-align:right;margin-top:10px;font-size:.8rem;color:var(--muted)}
+.pwd-score-total b{color:var(--green)}
 .pwd-cracktime{margin:16px 0;padding:14px 18px;border-radius:13px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);font-size:.9rem;line-height:1.6;color:#c3d2e6;text-align:center}
 .pwd-cracktime b{color:var(--cyan);font-size:1.02rem}
 .pwd-crack-scenarios{display:flex;flex-direction:column;gap:8px;margin-top:12px}
@@ -187,12 +187,6 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .pwd-finding .ft{flex:1}
 .pwd-forgot{text-align:center;font-size:.74rem;color:var(--muted);margin-top:16px;padding:10px;background:rgba(52,211,153,.05);border:1px dashed rgba(52,211,153,.3);border-radius:10px;font-weight:800;letter-spacing:.3px;line-height:1.5}
 .pwd-forgot b{color:var(--green)}
-.pwd-consent{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid rgba(251,191,36,.35);border-radius:12px;color:#fde68a;font-size:.8rem;line-height:1.5}
-.pwd-consent input{flex-shrink:0;margin-top:3px;accent-color:var(--cyan)}
-.pwd-ai-box{background:linear-gradient(160deg,rgba(34,211,238,.08),rgba(167,139,250,.08));border:1px solid rgba(34,211,238,.35);border-radius:14px;padding:16px}
-.pwd-ai-box h3{font-size:.85rem;color:var(--cyan);margin-bottom:8px}
-.pwd-ai-box p,.pwd-ai-box li{font-size:.82rem;line-height:1.6;color:#cdd9ea}
-.pwd-ai-box ul{padding-left:20px;margin-top:8px}
 .pwd-result-secret{margin-bottom:16px}
 .pwd-result-secret label{display:block;color:var(--muted);font-size:.75rem;font-weight:900;margin:0 0 7px 4px}
 
@@ -613,7 +607,7 @@ function shuffleQuestion(q){
 }
 
 /* ============================================================
-   IA AVANZADA DE CONTRASEÑAS
+   ANÁLISIS LOCAL DE CONTRASEÑAS
    Modela 4 escenarios de ataque con velocidades reales de hashcat
    ============================================================ */
 
@@ -638,6 +632,7 @@ function analyzePassword(pw){
     recommendations: [],
     crackScenarios: [],
     primaryCrackTime: '',
+    scoreBreakdown: { length: 0, variety: 0, bonuses: 0, penalties: 0, base: 0 },
     level: null,
     length: pw ? pw.length : 0
   };
@@ -672,14 +667,13 @@ function analyzePassword(pw){
   else if (len < 16) lenScore = 30;
   else if (len < 20) lenScore = 45;
   else lenScore = 60;
-  results.score += lenScore;
 
   if (len >= 16) results.strengths.push('Longitud excelente (' + len + ' caracteres): muy difícil de romper por fuerza bruta.');
   else if (len >= 12) results.strengths.push('Longitud buena (' + len + ' caracteres).');
   else if (len < 8) results.weaknesses.push('Longitud insuficiente (' + len + ' caracteres). Lo recomendable es 12–16 o más.');
   else results.weaknesses.push('Longitud corta (' + len + ' caracteres). Intenta llegar a 16+.');
 
-  // --- VARIEDAD (máx 55 pts) ---
+  // --- VARIEDAD (máx 50 pts) ---
   var varietyScore = 0;
   var typesCount = 0;
   if (hasLower) { varietyScore += 10; typesCount++; }
@@ -687,8 +681,7 @@ function analyzePassword(pw){
   if (hasDigit) { varietyScore += 10; typesCount++; }
   if (hasSymbol) { varietyScore += 15; typesCount++; }
   if (hasSpace) { varietyScore += 5; typesCount++; }
-  varietyScore = Math.min(varietyScore, 55);
-  results.score += varietyScore;
+  varietyScore = Math.min(varietyScore, 50);
 
   if (typesCount >= 4) results.strengths.push('Combinas varios tipos de caracteres. Excelente variedad.');
   else if (typesCount === 3) results.strengths.push('Usas 3 tipos de caracteres. Bien, pero puedes añadir más variedad.');
@@ -699,10 +692,13 @@ function analyzePassword(pw){
   if (!hasSymbol) results.weaknesses.push('No contiene símbolos especiales (ej. !@#$%^&*).');
 
   // --- PATRONES COMUNES ---
+  var penalties = 0;
+  var bonuses = 0;
   var isCommon = COMMON_PW.indexOf(lower) !== -1;
   if (isCommon) {
     results.weaknesses.push('⚠️ Está en las listas de contraseñas más usadas del mundo. Se rompe en segundos.');
-    results.score -= 60;
+    penalties += 60;
+    results.recommendations.push('Evita contraseñas conocidas y reutilizadas; crea una clave única con ayuda de un gestor.');
   }
 
   var dictHit = null;
@@ -711,44 +707,61 @@ function analyzePassword(pw){
   }
   if (dictHit) {
     results.weaknesses.push('Contiene la palabra común "' + dictHit + '", fácil de adivinar.');
-    results.score -= 20;
+    penalties += 20;
+    results.recommendations.push('Evita palabras comunes o nombres; usa varias palabras aleatorias y no relacionadas.');
   }
 
   var yearMatch = pw.match(/(19|20)\d{2}/);
   if (yearMatch) {
     results.weaknesses.push('Contiene un año (' + yearMatch[0] + '), típico en cumpleaños y fechas.');
-    results.score -= 10;
+    penalties += 10;
+    results.recommendations.push('Quita años y fechas personales, que suelen ser fáciles de descubrir.');
   }
 
-  if (/012|123|234|345|456|567|678|789/.test(pw)) {
+  var hasNumberSequence = /012|123|234|345|456|567|678|789/.test(pw);
+  if (hasNumberSequence) {
     results.weaknesses.push('Contiene una secuencia numérica (123...). Los atacantes la prueban primero.');
-    results.score -= 15;
+    penalties += 15;
+    results.recommendations.push('Evita secuencias consecutivas de números y sustituciones previsibles.');
   }
-  if (/abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz/i.test(pw)) {
+  var hasLetterSequence = /abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz/i.test(pw);
+  if (hasLetterSequence) {
     results.weaknesses.push('Contiene una secuencia alfabética (abc...). Patrón muy predecible.');
-    results.score -= 15;
+    penalties += 15;
+    results.recommendations.push('Evita secuencias alfabéticas como abc o xyz.');
   }
-  if (/(.)\1{2,}/.test(pw)) {
+  var hasRepeatedCharacters = /(.)\1{2,}/.test(pw);
+  if (hasRepeatedCharacters) {
     results.weaknesses.push('Contiene 3 o más caracteres repetidos. Reduce la entropía.');
-    results.score -= 10;
+    penalties += 10;
+    results.recommendations.push('Evita repetir el mismo carácter varias veces seguidas.');
   }
-  if (/qwerty|asdf|zxcv|qaz|wsx|edc/i.test(pw)) {
+  var hasKeyboardPattern = /qwerty|asdf|zxcv|qaz|wsx|edc/i.test(pw);
+  if (hasKeyboardPattern) {
     results.weaknesses.push('Contiene un patrón de teclado (qwerty, asdf...). Muy predecible.');
-    results.score -= 20;
+    penalties += 20;
+    results.recommendations.push('No uses recorridos del teclado como qwerty o asdf.');
   }
 
   // --- BONUS ---
   if (len >= 16 && typesCount >= 3 && !isCommon && !yearMatch) {
-    results.score += 20;
+    bonuses += 20;
     results.strengths.push('Longitud y variedad cumplen los estándares modernos.');
   }
   if (len >= 20 && hasSpace) {
-    results.score += 25;
+    bonuses += 25;
     results.strengths.push('Frase larga con espacios: gran entropía y fácil de recordar.');
   }
 
-  // El cálculo base alcanza 155 puntos; se escala para que el máximo anunciado sea alcanzable.
-  results.score = Math.round(Math.max(0, Math.min(155, results.score)) * 200 / 155);
+  var baseScore = Math.max(0, Math.min(155, lenScore + varietyScore + bonuses - penalties));
+  results.scoreBreakdown = {
+    length: lenScore,
+    variety: varietyScore,
+    bonuses: bonuses,
+    penalties: penalties,
+    base: baseScore
+  };
+  results.score = Math.round(baseScore * 200 / 155);
 
   // --- ESTIMACIONES CON VELOCIDADES DE REFERENCIA DE HASHCAT ---
   results.crackScenarios = buildCrackScenarios(pw, {
@@ -765,6 +778,9 @@ function analyzePassword(pw){
   if (!hasSymbol) results.recommendations.push('Añade al menos un símbolo (!@#$%^&*).');
   if (typesCount < 4) results.recommendations.push('Combina los 4 tipos de caracteres.');
   if (len < 20) results.recommendations.push('Considera una frase de 4–5 palabras con separadores.');
+  if (len >= 20 && hasSpace && typesCount >= 4 && results.recommendations.length === 0) {
+    results.recommendations.push('No reutilices esta contraseña y guárdala en un gestor de contraseñas.');
+  }
   if (results.recommendations.length === 0) results.recommendations.push('¡Vas por buen camino! Mantén esta práctica.');
 
   results.level = classifyPasswordStrength(results.score);
@@ -906,7 +922,6 @@ var state = {
   sessionOk:0, sessionKo:0, sessionScore:0, review:[],
   quizShuffled:null, configShuffled:null,
   configTogglesInitialized:false, configTogglesForIndex:-1,
-  passwordInput:'',
   passwordResult:null,
   passwordDisplay:'',
   passwordBestResult:null,
@@ -986,7 +1001,7 @@ function renderLobby(){
     '<div class="rules">' +
       '<div class="rule"><div class="num">1</div><div>Hay <b>6 minijuegos</b>, cada uno con su propia mecánica y su propio tema.</div></div>' +
       '<div class="rule"><div class="num">2</div><div>En los juegos de <b>marcar un grupo</b>, tú decides cuándo has terminado: pulsa <b style="color:var(--amber)">Finalizar</b> cuando creas que ya has marcado todas las respuestas correctas.</div></div>' +
-      '<div class="rule"><div class="num">3</div><div>En <b>Contraseñas</b> crearás tu propia contraseña y una IA te dará una puntuación de hasta 200 pts.</div></div>' +
+      '<div class="rule"><div class="num">3</div><div>En <b>Contraseñas</b> probarás una contraseña ficticia y recibirás una puntuación local de hasta 200 pts.</div></div>' +
       '<div class="rule"><div class="num">4</div><div>Cada respuesta correcta suma y cada fallo resta. Los puntos se van acumulando.</div></div>' +
       '<div class="rule"><div class="num">5</div><div>Si repites un minijuego, tu puntuación anterior <b>se descuenta al empezar</b>: solo cuenta la última.</div></div>' +
       '<div class="rule"><div class="num">6</div><div>Al completar los 6 juegos, verás tu <b>resultado final</b> con un análisis personalizado.</div></div>' +
@@ -1005,7 +1020,7 @@ function renderSelect(){
     var done = state.done[g.id];
     var desc = g.type==='clicker' ? g.count+' elementos para marcar' :
                g.type==='quiz' ? g.count+' preguntas' :
-               g.type==='password' ? 'Crea una contraseña · IA' : g.count+' escenarios';
+               g.type==='password' ? 'Analiza una contraseña localmente' : g.count+' escenarios';
     return '<button class="tema-card '+(done?'done':'')+'" data-action="pick-game" data-val="'+i+'" style="--tc:'+g.color+'">' +
       '<div class="tema-head"><div class="tema-ico-wrap">'+g.icon+'</div><div>' +
       '<div class="tema-name">'+g.name+'</div><div class="tema-desc" style="margin-top:2px">'+desc+'</div></div></div>' +
@@ -1028,7 +1043,7 @@ function renderIntro(){
     var verbo = g.id==='phishing' ? 'phishing' : g.id==='malware' ? 'peligrosos' : 'estafa';
     how = 'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son <b>'+verbo+'</b>. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa <b>Finalizar y ver resultado</b>.';
   } else if(g.type==='quiz'){ how = 'Lee cada pregunta con calma y elige la opción correcta entre <b>A, B o C</b>. <b>Las opciones se barajan en cada partida</b>.'; }
-  else if(g.type==='password'){ how = 'Crea una contraseña ficticia y pulsa <b>Analizar con IA</b>. La IA te dará consejos; el juego mostrará estimaciones orientativas para distintos algoritmos y equipos. No existe un tiempo único: depende de cómo almacene las contraseñas cada servicio.<br><br>🔒 <b style="color:var(--amber)">No uses una contraseña real.</b> Al aceptar el aviso, el texto se envía por HTTPS a OpenRouter para analizarlo. Se solicita enrutamiento Zero Data Retention, pero el tratamiento depende también del proveedor que procese la petición.<br><br>Puedes probar varias contraseñas ficticias; al finalizar se guardará tu <b>mejor resultado</b>.'; }
+  else if(g.type==='password'){ how = 'Escribe una contraseña ficticia y pulsa <b>Analizar contraseña</b>. El análisis se calcula en este dispositivo: el texto no se envía al servidor ni a servicios externos. Verás consejos y estimaciones didácticas para distintos algoritmos y equipos; no existe un tiempo único y real, pues depende de cómo almacene las contraseñas cada servicio.<br><br>🔒 <b style="color:var(--amber)">No uses una contraseña real.</b> Las estimaciones son orientativas, no una predicción. Puedes probar varias contraseñas ficticias; al finalizar se guardará tu <b>mejor resultado</b>.'; }
   else { how = 'Vas a ver <b>'+g.data.length+' escenarios reales</b> de dificultad creciente. En cada uno, activa los interruptores que correspondan a <b>buenas prácticas de seguridad</b> y deja desactivados los que sean <b>malas prácticas</b>.<br><br>⚠️ <b style="color:var(--amber)">¡Cuidado con las trampas!</b> Algunas opciones suenan a buena práctica (mejorar velocidad, conectar fácil) pero son <b>malas ideas de seguridad</b>.<br><br>✅ Al comprobar, <b>te explicaremos por qué cada respuesta es correcta o incorrecta</b>. <b>El orden se baraja en cada partida</b>.'; }
   var warn = '';
   if(state.results[g.id]){
@@ -1449,31 +1464,21 @@ function renderPassword(){
       : '';
 
     inner =
-      '<div class="pwd-privacy-banner">' +
-        '<span class="lock">🔒</span><b>Privacidad:</b> usa solo una contraseña ficticia. Al analizarla, se enviará por HTTPS al servidor del juego y a OpenRouter; la clave de acceso nunca se expone en tu navegador. No se guarda en el progreso del juego y se solicita Zero Data Retention, pero no podemos garantizar cómo la procesa cada proveedor externo.' +
-      '</div>' +
+      '<div class="pwd-forgot">🔒 El análisis se realiza localmente en este dispositivo. La contraseña no se envía a ningún servidor ni se guarda en tu progreso. Usa solo una contraseña ficticia.</div>' +
       bestLabel +
       '<div class="pwd-input-wrap">' +
-        '<input type="password" id="pwd-input-field" class="pwd-input" aria-label="Contraseña ficticia a analizar" placeholder="Escribe una contraseña ficticia..." autocomplete="off" spellcheck="false" maxlength="128">' +
+        '<input type="password" id="pwd-input-field" class="pwd-input" aria-label="Contraseña ficticia para análisis local" placeholder="Escribe una contraseña ficticia..." autocomplete="off" spellcheck="false" maxlength="128">' +
         '<button class="pwd-toggle-vis" data-action="pwd-toggle-vis" title="Mostrar/ocultar contraseña" aria-label="Mostrar u ocultar contraseña">👁️</button>' +
       '</div>' +
       '<div class="pwd-charcount"><span>🔐 Longitud</span><span class="cnt" id="pwd-char-counter">0 caracteres</span></div>' +
-      '<label class="pwd-consent"><input type="checkbox" id="pwd-consent">' +
-        '<span>Entiendo que esta contraseña ficticia se enviará a un servicio de IA externo para analizarla.</span></label>' +
-      '<button class="btn btn-primary" data-action="pwd-analyze">🤖 Analizar con IA</button>' +
+      '<button class="btn btn-primary" data-action="pwd-analyze">🔐 Analizar contraseña</button>' +
       '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
-  } else if(phase === 'analyzing'){
-    inner =
-      '<div class="pwd-analyzing">' +
-        '<div class="pwd-spinner"></div>' +
-        '<div class="pwd-analyzing-text">🤖 La IA está analizando tu contraseña...</div>' +
-        '<div class="pwd-analyzing-sub">Calculando una estimación didáctica y preparando recomendaciones</div>' +
-      '</div>';
   } else if(phase === 'result'){
     var r = state.passwordResult;
     if(!r){ state.passwordPhase = 'input'; return renderPassword(); }
     var lvl = classifyPasswordStrength(r.score);
     var pct = (r.score / 200) * 100;
+    var breakdown = r.scoreBreakdown;
 
     var strengthsHTML = r.strengths.map(function(s){
       return '<div class="pwd-finding ok"><span class="fi">✅</span><span class="ft">' + escHTML(s) + '</span></div>';
@@ -1491,11 +1496,11 @@ function renderPassword(){
       return '<div class="pwd-crack-row"><span class="cl">' + escHTML(sc.name) + '<small>' + escHTML(sc.hashType) + '</small></span><span class="cr">' + escHTML(sc.formatted) + '</span></div>';
     }).join('');
 
-    var ai = r.ai;
-    var aiLists = '';
-    if(ai.strengths.length) aiLists += '<h4>Puntos fuertes</h4><ul>' + ai.strengths.map(function(x){return '<li>'+escHTML(x)+'</li>';}).join('') + '</ul>';
-    if(ai.weaknesses.length) aiLists += '<h4 style="margin-top:10px">A tener en cuenta</h4><ul>' + ai.weaknesses.map(function(x){return '<li>'+escHTML(x)+'</li>';}).join('') + '</ul>';
-    if(ai.recommendations.length) aiLists += '<h4 style="margin-top:10px">Ideas para mejorar</h4><ul>' + ai.recommendations.map(function(x){return '<li>'+escHTML(x)+'</li>';}).join('') + '</ul>';
+    var scoreStepsHTML =
+      '<div class="pwd-score-step"><span class="step-no">1.</span><span class="step-label">Longitud</span><span class="step-value">' + breakdown.length + ' / 60</span></div>' +
+      '<div class="pwd-score-step"><span class="step-no">2.</span><span class="step-label">Variedad de caracteres</span><span class="step-value">' + breakdown.variety + ' / 50</span></div>' +
+      '<div class="pwd-score-step"><span class="step-no">3.</span><span class="step-label">Patrones previsibles</span><span class="step-value">' + (breakdown.penalties ? '−' + breakdown.penalties : '0') + ' pts</span></div>' +
+      '<div class="pwd-score-step"><span class="step-no">4.</span><span class="step-label">Bonificaciones por longitud y frase</span><span class="step-value">+' + breakdown.bonuses + ' pts</span></div>';
 
     inner =
       '<div class="pwd-result-secret">' +
@@ -1514,6 +1519,12 @@ function renderPassword(){
         '<div class="pwd-meter-label"><span>Seguridad</span><span>' + r.score + '/200</span></div>' +
         '<div class="pwd-meter-bar"><div class="pwd-meter-fill" style="width:' + pct + '%;background:' + lvl.color + '"></div></div>' +
       '</div>' +
+      '<div class="pwd-score-sequence">' +
+        '<div class="pwd-findings-head">SECUENCIA DE EVALUACIÓN</div>' +
+        scoreStepsHTML +
+        '<div class="pwd-score-total">Puntuación base: ' + breakdown.base + ' / 155 → <b>' + r.score + ' / 200</b></div>' +
+        '<div class="pwd-score-total">Es una guía educativa; no garantiza seguridad ni comprueba filtraciones.</div>' +
+      '</div>' +
       '<div class="pwd-cracktime">⏱️ <b>' + escHTML(r.primaryCrackTime) + '</b><br>Las filas son supuestos alternativos, no una predicción exacta. La cifra depende del algoritmo de almacenamiento, su configuración y el equipo atacante.</div>' +
       '<div class="pwd-crack-scenarios">' +
         '<div class="pwd-findings-head">🎯 ESTIMACIONES DIDÁCTICAS · REFERENCIA RTX 4090 (FIJA, NO EN VIVO)</div>' +
@@ -1524,8 +1535,7 @@ function renderPassword(){
         (weaknessesHTML ? '<div class="pwd-findings-head">❌ PUNTOS DÉBILES</div>' + weaknessesHTML : '') +
         (recsHTML ? '<div class="pwd-findings-head">💡 RECOMENDACIONES</div>' + recsHTML : '') +
       '</div>' +
-      '<div class="pwd-ai-box"><h3>🤖 Consejo personalizado de la IA</h3><p>' + escHTML(ai.summary) + '</p>' + aiLists + '</div>' +
-      '<div class="pwd-forgot">🔒 La aplicación no guarda la contraseña en tu progreso. Se mantiene en esta pantalla para que puedas verla; el servicio externo puede tener sus propias políticas de tratamiento.</div>' +
+      '<div class="pwd-forgot">🔒 El análisis se ha realizado en este dispositivo. La contraseña no se envía a ningún servidor ni se guarda en tu progreso.</div>' +
       '<button class="btn btn-primary" style="margin-top:14px" data-action="pwd-retry">🔐 Probar otra contraseña</button>' +
       '<button class="btn btn-finish" data-action="finish">🏁 Finalizar y ver resultado</button>';
   }
@@ -1548,70 +1558,22 @@ function renderPassword(){
   }
 }
 
-async function handlePasswordAnalyze(){
+function handlePasswordAnalyze(){
   var inp = document.getElementById('pwd-input-field');
   var val = inp ? inp.value : '';
-  var consent = document.getElementById('pwd-consent');
   if(!val || val.length === 0){
     toast('Escribe una contraseña primero', 'bad');
     return;
   }
-  if(!consent || !consent.checked){
-    toast('Confirma que usarás una contraseña ficticia', 'bad');
-    return;
+  var result = analyzePassword(val);
+  state.passwordResult = result;
+  state.passwordDisplay = val;
+  state.passwordPhase = 'result';
+  if(result.score > state.passwordBestScore){
+    state.passwordBestScore = result.score;
+    state.passwordBestResult = result;
   }
-  if(location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
-    toast('El análisis requiere una conexión HTTPS segura', 'bad');
-    return;
-  }
-
-  if(inp) inp.value = '';
-
-  state.passwordPhase = 'analyzing';
   render();
-
-  try{
-    var response = await fetch('/api/analyze-password', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:val}),
-      cache:'no-store',
-      credentials:'same-origin'
-    });
-    var payload;
-    try { payload = await response.json(); }
-    catch(e) { payload = {}; }
-    if(!response.ok){
-      throw new Error(payload.error || 'El servicio de análisis no está disponible.');
-    }
-    if(!payload.analysis || typeof payload.analysis.summary !== 'string' ||
-       !Array.isArray(payload.analysis.strengths) ||
-       !Array.isArray(payload.analysis.weaknesses) ||
-       !Array.isArray(payload.analysis.recommendations)){
-      throw new Error('El servicio de IA devolvió una respuesta no válida.');
-    }
-
-    var result = analyzePassword(val);
-    result.ai = payload.analysis;
-    state.passwordResult = result;
-    state.passwordDisplay = val;
-    state.passwordInput = '';
-    val = '';
-    if(result.score > state.passwordBestScore){
-      state.passwordBestScore = result.score;
-      state.passwordBestResult = result;
-    }
-    state.passwordPhase = 'result';
-    render();
-  } catch(e){
-    val = '';
-    state.passwordInput = '';
-    state.passwordResult = null;
-    state.passwordDisplay = '';
-    state.passwordPhase = 'input';
-    render();
-    toast(e.message || 'No se pudo completar el análisis. Prueba más tarde.', 'bad');
-  }
 }
 
 function handlePasswordToggleVis(){
@@ -1712,11 +1674,10 @@ function finishGame(){
         ok: false,
         userDid: 'Sin datos',
         userBadge: 'unanswered',
-        why: 'Para puntuar en este minijuego, escribe una contraseña y pulsa "Analizar con IA".',
+        why: 'Para puntuar en este minijuego, escribe una contraseña ficticia y pulsa "Analizar contraseña".',
         correctAction: null
       }];
     }
-    state.passwordInput = '';
     state.passwordResult = null;
     state.passwordDisplay = '';
     state.passwordBestResult = null;
@@ -1882,7 +1843,6 @@ function startGame(idx){
     state.items = g.data.map(function(it){ var c = {}; for(var k in it) c[k] = it[k]; c.marked = false; return c; });
   }
   if(g.type==='password'){
-    state.passwordInput = '';
     state.passwordResult = null;
     state.passwordDisplay = '';
     state.passwordBestResult = null;
@@ -1917,7 +1877,6 @@ function startCurrentGame(){
       return { icon:s.icon, level:s.level, title:s.title, desc:s.desc, traps:s.traps, toggles:shuffledToggles };
     });
   } else if(g.type==='password'){
-    state.passwordInput = '';
     state.passwordResult = null;
     state.passwordDisplay = '';
     state.passwordBestResult = null;
@@ -1964,10 +1923,6 @@ function handleAction(action, val){
       }
       break;
     case 'finish':
-      if(state.passwordPhase === 'analyzing'){
-        toast('Espera al análisis', 'bad');
-        return;
-      }
       finishGame();
       break;
   }
