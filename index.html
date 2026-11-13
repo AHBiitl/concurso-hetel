@@ -54,13 +54,26 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .maxscore-total .ms-left{color:var(--txt)}
 .maxscore-total .ms-right{color:var(--amber);font-variant-numeric:tabular-nums}
 .temas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:30px 0}
-.tema-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(20,34,56,.94),rgba(8,16,29,.94));border:1px solid var(--line);border-radius:20px;padding:24px 22px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s;text-align:left;font-family:inherit;color:var(--txt);display:flex;flex-direction:column;gap:14px;min-height:178px}
+.tema-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(20,34,56,.94),rgba(8,16,29,.94));border:1px solid var(--line);border-radius:20px;padding:24px 22px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s;text-align:left;font-family:inherit;color:var(--txt);display:flex;flex-direction:column;gap:14px;min-height:178px;animation:tema-reveal .5s both}
 .tema-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--tc,var(--cyan));opacity:.75}
 .tema-card:hover{transform:translateY(-5px);border-color:var(--tc,var(--cyan));box-shadow:0 18px 38px -25px var(--tc,var(--cyan))}
 .tema-card:focus-visible{outline:3px solid var(--tc,var(--cyan));outline-offset:3px}
 .tema-card.done{border-color:rgba(52,211,153,.5);background:linear-gradient(160deg,rgba(14,38,32,.85),rgba(10,26,24,.85))}
 .tema-head{display:flex;align-items:center;gap:12px}
-.tema-ico-wrap{width:60px;height:60px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid var(--tc,rgba(34,211,238,.4))}
+.tema-ico-wrap{position:relative;width:60px;height:60px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid var(--tc,rgba(34,211,238,.4));will-change:transform,box-shadow}
+.tema-phishing .tema-ico-wrap{animation:tema-float 3s ease-in-out infinite}
+.tema-encriptado .tema-ico-wrap{animation:tema-lock 2.8s ease-in-out infinite}
+.tema-contrasenas .tema-ico-wrap{animation:tema-key 3.2s ease-in-out infinite}
+.tema-malware .tema-ico-wrap{animation:tema-glitch 4s steps(1,end) infinite}
+.tema-redes .tema-ico-wrap{animation:tema-signal 2.4s ease-in-out infinite}
+.tema-ingSocial .tema-ico-wrap{animation:tema-chat 3.4s ease-in-out infinite}
+@keyframes tema-reveal{from{opacity:0;filter:blur(5px)}to{opacity:1;filter:blur(0)}}
+@keyframes tema-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(-5deg)}}
+@keyframes tema-lock{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes tema-key{0%,100%{transform:rotate(0)}35%{transform:rotate(-8deg)}65%{transform:rotate(6deg)}}
+@keyframes tema-glitch{0%,88%,92%,96%,100%{transform:translate(0) skew(0)}90%{transform:translate(-2px,1px) skew(-4deg)}94%{transform:translate(2px,-1px) skew(4deg)}}
+@keyframes tema-signal{0%,100%{box-shadow:0 0 0 0 rgba(96,165,250,0)}50%{box-shadow:0 0 20px -5px rgba(96,165,250,.75)}}
+@keyframes tema-chat{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-4px) rotate(4deg)}70%{transform:translateY(1px) rotate(-3deg)}}
 .tema-card .tema-name{font-size:1.12rem;font-weight:900;color:var(--tc,var(--cyan))}
 .tema-card .tema-desc{font-size:.84rem;line-height:1.55;color:var(--muted)}
 .tema-card .tema-max{font-size:.72rem;color:var(--amber);font-weight:800}
@@ -70,6 +83,7 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .select-highlight{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(10,20,34,.72);font-size:.76rem;font-weight:800;color:#cdd9ea}
 @media(max-width:900px){.temas-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.tema-card{min-height:160px;padding:20px}}
 @media(max-width:560px){#stage.stage-select{padding:18px 14px}.temas-grid{grid-template-columns:1fr;gap:12px;margin:22px 0}.tema-card{min-height:0;padding:17px}.tema-ico-wrap{width:50px;height:50px;font-size:1.7rem}.select-highlights{gap:7px}.select-highlight{font-size:.68rem;padding:8px 10px}}
+@media(prefers-reduced-motion:reduce){.tema-card{animation:none}.tema-ico-wrap{animation:none!important}}
 .btn{display:block;width:100%;font-family:inherit;font-size:.95rem;font-weight:800;padding:15px 20px;border-radius:14px;cursor:pointer;border:1px solid;transition:.2s;letter-spacing:.3px}
 .btn-primary{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(167,139,250,.22));border-color:rgba(34,211,238,.55);color:#c8ecf7}
 .btn-primary:hover{background:linear-gradient(135deg,rgba(34,211,238,.36),rgba(167,139,250,.36));transform:translateY(-2px)}
@@ -915,7 +929,7 @@ function renderSelect(){
     var desc = g.type==='clicker' ? g.count+' elementos para marcar' :
                g.type==='quiz' ? g.count+' preguntas' :
                g.type==='password' ? 'Analiza una contraseña localmente' : g.count+' escenarios';
-    return '<button class="tema-card '+(done?'done':'')+'" data-action="pick-game" data-val="'+i+'" style="--tc:'+g.color+'">' +
+    return '<button class="tema-card tema-'+g.id+' '+(done?'done':'')+'" data-action="pick-game" data-val="'+i+'" style="--tc:'+g.color+';animation-delay:'+(i*70)+'ms">' +
       '<div class="tema-head"><div class="tema-ico-wrap">'+g.icon+'</div><div>' +
       '<div class="tema-name">'+g.name+'</div><div class="tema-desc" style="margin-top:2px">'+desc+'</div></div></div>' +
       '<div class="tema-max">Máximo · '+g.max+' pts</div>' +
