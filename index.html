@@ -170,13 +170,6 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .pwd-score-step .step-value{font-weight:900;color:var(--cyan);white-space:nowrap}
 .pwd-score-total{text-align:right;margin-top:10px;font-size:.8rem;color:var(--muted)}
 .pwd-score-total b{color:var(--green)}
-.pwd-cracktime{margin:16px 0;padding:14px 18px;border-radius:13px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);font-size:.9rem;line-height:1.6;color:#c3d2e6;text-align:center}
-.pwd-cracktime b{color:var(--cyan);font-size:1.02rem}
-.pwd-crack-scenarios{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.pwd-crack-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;font-size:.8rem;background:rgba(3,6,13,.6);border:1px solid rgba(26,44,70,.6)}
-.pwd-crack-row .cl{color:var(--muted);font-weight:700;display:flex;flex-direction:column;gap:3px}
-.pwd-crack-row .cl small{font-size:.65rem;color:#7185a3;font-weight:600}
-.pwd-crack-row .cr{font-weight:900;font-variant-numeric:tabular-nums;color:var(--cyan)}
 .pwd-findings{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .pwd-findings-head{font-size:.72rem;font-weight:900;letter-spacing:1.5px;color:var(--muted);margin-top:12px;margin-bottom:2px}
 .pwd-finding{padding:10px 14px;border-radius:10px;font-size:.84rem;line-height:1.55;display:flex;gap:10px;align-items:flex-start}
@@ -608,21 +601,10 @@ function shuffleQuestion(q){
 
 /* ============================================================
    ANÁLISIS LOCAL DE CONTRASEÑAS
-   Modela 4 escenarios de ataque con velocidades reales de hashcat
    ============================================================ */
 
 var COMMON_PW = ['123456','password','12345678','qwerty','123456789','12345','1234','111111','1234567','dragon','123123','baseball','abc123','football','monkey','letmein','696969','shadow','master','666666','qwertyuiop','123321','mustang','1234567890','michael','654321','superman','1qaz2wsx','7777777','121212','000000','qazwsx','123qwe','killer','trustno1','jordan','jennifer','zxcvbnm','asdfgh','hunter','buster','soccer','harley','batman','andrew','tigger','sunshine','iloveyou','2000','charlie','robert','thomas','hockey','ranger','daniel','starwars','klaster','112233','george','computer','michelle','jessica','pepper','1111','zxcvbn','555555','11111111','131313','freedom','777777','pass','maggie','159753','aaaaaa','ginger','princess','joshua','cheese','amanda','summer','love','ashley','6969','nicole','chelsea','biteme','matthew','access','yankees','987654321','dallas','austin','thunder','taylor','matrix'];
 var DICT_WORDS = ['password','admin','user','login','welcome','secret','love','iloveyou','qwerty','abc','test','demo','letmein','master','root','toor','default','guest','asdf','zxcv','michael','jennifer','jesus','angel','dragon','monkey','football','baseball','soccer','hockey','shadow','sunshine','princess','freedom','whatever','trustno','computer','internet','google','facebook','amazon','apple','microsoft','samsung','iphone','android'];
-
-// Velocidades medidas en RTX 4090 (hashcat v7.0.0 / v6.2.6) — hashes/segundo
-var HASH_SPEEDS = {
-  'MD5':      164100000000,   // 164.1 GH/s
-  'SHA-1':     50638700000,   // 50.6 GH/s
-  'SHA-256':   21975500000,   // 21.9 GH/s
-  'SHA-512':    7483400000,   // 7.5 GH/s
-  'bcrypt':        1400,      // cost 12 (aprox)
-  'Argon2id':        25       // ~25 H/s
-};
 
 function analyzePassword(pw){
   var results = {
@@ -630,8 +612,6 @@ function analyzePassword(pw){
     strengths: [],
     weaknesses: [],
     recommendations: [],
-    crackScenarios: [],
-    primaryCrackTime: '',
     scoreBreakdown: { length: 0, variety: 0, bonuses: 0, penalties: 0, base: 0 },
     level: null,
     length: pw ? pw.length : 0
@@ -639,7 +619,6 @@ function analyzePassword(pw){
 
   if (!pw || pw.length === 0) {
     results.weaknesses.push('La contraseña está vacía.');
-    results.primaryCrackTime = 'instantáneo';
     results.level = classifyPasswordStrength(0);
     return results;
   }
@@ -651,14 +630,6 @@ function analyzePassword(pw){
   var hasDigit = /[0-9]/.test(pw);
   var hasSymbol = /[^a-zA-Z0-9]/.test(pw);
   var hasSpace = /\s/.test(pw);
-
-  var charset = 0;
-  if (hasLower) charset += 26;
-  if (hasUpper) charset += 26;
-  if (hasDigit) charset += 10;
-  if (hasSymbol) charset += 33;
-  if (hasSpace) charset += 1;
-  if (charset === 0) charset = 1;
 
   // --- LONGITUD (máx 60 pts) ---
   var lenScore = 0;
@@ -763,14 +734,6 @@ function analyzePassword(pw){
   };
   results.score = Math.round(baseScore * 200 / 155);
 
-  // --- ESTIMACIONES CON VELOCIDADES DE REFERENCIA DE HASHCAT ---
-  results.crackScenarios = buildCrackScenarios(pw, {
-    len: len, charset: charset, typesCount: typesCount,
-    isCommon: isCommon, dictHit: dictHit, yearMatch: yearMatch
-  });
-
-  results.primaryCrackTime = 'Depende del algoritmo y la configuración usados por cada servicio';
-
   // --- RECOMENDACIONES ---
   if (len < 16) results.recommendations.push('Amplía la longitud a 16+ caracteres.');
   if (!hasUpper) results.recommendations.push('Añade al menos una mayúscula.');
@@ -785,84 +748,6 @@ function analyzePassword(pw){
 
   results.level = classifyPasswordStrength(results.score);
   return results;
-}
-
-/**
- * Genera 4 escenarios orientativos con velocidades de referencia de hashcat.
- * Devuelve [{ name, seconds, formatted, hashType }]
- */
-function buildCrackScenarios(pw, meta){
-  var len = meta.len;
-  var charset = meta.charset;
-  var scenarios = [];
-
-  // 1) Fuerza bruta pura contra MD5 (el peor caso para contraseñas aleatorias)
-  var keyspaceFull = Math.pow(charset, len);
-  // hashcat prueba ~164 GH/s en MD5
-  var secondsBruteMD5 = keyspaceFull / HASH_SPEEDS['MD5'];
-  scenarios.push({
-    name: 'Fuerza bruta · MD5',
-    seconds: secondsBruteMD5,
-    formatted: humanizeTime(secondsBruteMD5),
-    hashType: 'MD5 (164 GH/s)'
-  });
-
-  // 2) Diccionario (rockyou ~14M) + reglas best64 → ~900M candidatos
-  // Si la contraseña contiene una palabra común, el diccionario la encuentra mucho antes
-  var dictCandidates = 14e6 * 64; // ~896M
-  var secondsDict;
-  if (meta.dictHit || meta.isCommon) {
-    // Si coincide con palabra común, puede estar entre los primeros
-    secondsDict = 1 / HASH_SPEEDS['bcrypt']; // ~instantáneo en bcrypt
-  } else if (meta.yearMatch) {
-    secondsDict = dictCandidates / 100 / HASH_SPEEDS['bcrypt']; // reducido por año
-  } else {
-    secondsDict = dictCandidates / HASH_SPEEDS['bcrypt'];
-  }
-  scenarios.push({
-    name: 'Diccionario + reglas · bcrypt',
-    seconds: secondsDict,
-    formatted: humanizeTime(secondsDict),
-    hashType: 'bcrypt cost 12 (1.4k H/s)'
-  });
-
-  // 3) Ataque híbrido (palabra + máscara de 4 dígitos) contra SHA-256
-  // ~14M palabras × 10^4 combinaciones = 1.4e11 candidatos
-  var hybridCandidates = 14e6 * 10000;
-  var secondsHybrid = hybridCandidates / HASH_SPEEDS['SHA-256'];
-  scenarios.push({
-    name: 'Híbrido (palabra+4 dígitos) · SHA-256',
-    seconds: secondsHybrid,
-    formatted: humanizeTime(secondsHybrid),
-    hashType: 'SHA-256 (22 GH/s)'
-  });
-
-  // 4) Peor caso realista: Argon2id + diccionario (lento por diseño)
-  // Argon2id ~25 H/s → 900M candidatos tardarían ~416 días
-  var secondsArgon = dictCandidates / HASH_SPEEDS['Argon2id'];
-  scenarios.push({
-    name: 'Diccionario · Argon2id',
-    seconds: secondsArgon,
-    formatted: humanizeTime(secondsArgon),
-    hashType: 'Argon2id (~25 H/s)'
-  });
-
-  return scenarios;
-}
-
-function humanizeTime(sec) {
-  if (!isFinite(sec)) return 'eones (más que la edad del universo)';
-  if (sec < 1) return 'menos de 1 segundo';
-  if (sec < 60) return Math.round(sec) + ' segundos';
-  if (sec < 3600) return Math.round(sec / 60) + ' minutos';
-  if (sec < 86400) return Math.round(sec / 3600) + ' horas';
-  if (sec < 2592000) return Math.round(sec / 86400) + ' días';
-  if (sec < 31536000) return Math.round(sec / 2592000) + ' meses';
-  if (sec < 3.15e9) return Math.round(sec / 31536000) + ' años';
-  if (sec < 3.15e12) return Math.round(sec / 3.15e9) + ' mil años';
-  if (sec < 3.15e15) return Math.round(sec / 3.15e12) + ' millones de años';
-  if (sec < 3.15e18) return Math.round(sec / 3.15e15) + ' mil millones de años';
-  return 'eones (más que la edad del universo)';
 }
 
 function classifyPasswordStrength(score) {
@@ -1043,7 +928,7 @@ function renderIntro(){
     var verbo = g.id==='phishing' ? 'phishing' : g.id==='malware' ? 'peligrosos' : 'estafa';
     how = 'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son <b>'+verbo+'</b>. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa <b>Finalizar y ver resultado</b>.';
   } else if(g.type==='quiz'){ how = 'Lee cada pregunta con calma y elige la opción correcta entre <b>A, B o C</b>. <b>Las opciones se barajan en cada partida</b>.'; }
-  else if(g.type==='password'){ how = 'Escribe una contraseña ficticia y pulsa <b>Analizar contraseña</b>. El análisis se calcula en este dispositivo: el texto no se envía al servidor ni a servicios externos. Verás consejos y estimaciones didácticas para distintos algoritmos y equipos; no existe un tiempo único y real, pues depende de cómo almacene las contraseñas cada servicio.<br><br>🔒 <b style="color:var(--amber)">No uses una contraseña real.</b> Las estimaciones son orientativas, no una predicción. Puedes probar varias contraseñas ficticias; al finalizar se guardará tu <b>mejor resultado</b>.'; }
+  else if(g.type==='password'){ how = 'Escribe una contraseña ficticia y pulsa <b>Analizar contraseña</b>. El análisis se calcula en este dispositivo: el texto no se envía al servidor ni a servicios externos. Verás una puntuación sobre 200, los puntos fuertes, los patrones previsibles y recomendaciones para mejorarla.<br><br>🔒 <b style="color:var(--amber)">No uses una contraseña real.</b> La puntuación es orientativa, no una garantía de seguridad. Puedes probar varias contraseñas ficticias; al finalizar se guardará tu <b>mejor resultado</b>.'; }
   else { how = 'Vas a ver <b>'+g.data.length+' escenarios reales</b> de dificultad creciente. En cada uno, activa los interruptores que correspondan a <b>buenas prácticas de seguridad</b> y deja desactivados los que sean <b>malas prácticas</b>.<br><br>⚠️ <b style="color:var(--amber)">¡Cuidado con las trampas!</b> Algunas opciones suenan a buena práctica (mejorar velocidad, conectar fácil) pero son <b>malas ideas de seguridad</b>.<br><br>✅ Al comprobar, <b>te explicaremos por qué cada respuesta es correcta o incorrecta</b>. <b>El orden se baraja en cada partida</b>.'; }
   var warn = '';
   if(state.results[g.id]){
@@ -1492,10 +1377,6 @@ function renderPassword(){
       return '<div class="pwd-finding tip"><span class="fi">💡</span><span class="ft">' + escHTML(s) + '</span></div>';
     }).join('');
 
-    var crackRowsHTML = r.crackScenarios.map(function(sc){
-      return '<div class="pwd-crack-row"><span class="cl">' + escHTML(sc.name) + '<small>' + escHTML(sc.hashType) + '</small></span><span class="cr">' + escHTML(sc.formatted) + '</span></div>';
-    }).join('');
-
     var scoreStepsHTML =
       '<div class="pwd-score-step"><span class="step-no">1.</span><span class="step-label">Longitud</span><span class="step-value">' + breakdown.length + ' / 60</span></div>' +
       '<div class="pwd-score-step"><span class="step-no">2.</span><span class="step-label">Variedad de caracteres</span><span class="step-value">' + breakdown.variety + ' / 50</span></div>' +
@@ -1524,11 +1405,6 @@ function renderPassword(){
         scoreStepsHTML +
         '<div class="pwd-score-total">Puntuación base: ' + breakdown.base + ' / 155 → <b>' + r.score + ' / 200</b></div>' +
         '<div class="pwd-score-total">Es una guía educativa; no garantiza seguridad ni comprueba filtraciones.</div>' +
-      '</div>' +
-      '<div class="pwd-cracktime">⏱️ <b>' + escHTML(r.primaryCrackTime) + '</b><br>Las filas son supuestos alternativos, no una predicción exacta. La cifra depende del algoritmo de almacenamiento, su configuración y el equipo atacante.</div>' +
-      '<div class="pwd-crack-scenarios">' +
-        '<div class="pwd-findings-head">🎯 ESTIMACIONES DIDÁCTICAS · REFERENCIA RTX 4090 (FIJA, NO EN VIVO)</div>' +
-        crackRowsHTML +
       '</div>' +
       '<div class="pwd-findings">' +
         (strengthsHTML ? '<div class="pwd-findings-head">✅ PUNTOS FUERTES</div>' + strengthsHTML : '') +
@@ -1662,7 +1538,7 @@ function finishGame(){
         ok: best.score >= 130,
         userDid: 'Puntuación: ' + best.score + ' / 200',
         userBadge: 'selected',
-        why: 'Las estimaciones dependen del algoritmo y la configuración usados por cada servicio.<br>Fortalezas detectadas: ' + best.strengths.length + ' · Debilidades detectadas: ' + best.weaknesses.length + '.',
+        why: 'La puntuación es orientativa y se basa en longitud, variedad y patrones previsibles.<br>Fortalezas detectadas: ' + best.strengths.length + ' · Debilidades detectadas: ' + best.weaknesses.length + '.',
         correctAction: best.score < 130 ? 'Para superar el reto, busca 130+ pts' : null
       }];
     } else {
