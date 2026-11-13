@@ -18,7 +18,9 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .cyber-bg .grid{position:absolute;left:-10%;right:-10%;bottom:-5%;height:60%;background-image:linear-gradient(to right,rgba(34,211,238,.13) 1px,transparent 1px),linear-gradient(to bottom,rgba(34,211,238,.13) 1px,transparent 1px);background-size:60px 60px;transform:perspective(400px) rotateX(60deg);transform-origin:center bottom;mask-image:linear-gradient(to top,#000 0%,transparent 90%);-webkit-mask-image:linear-gradient(to top,#000 0%,transparent 90%);animation:gridScroll 14s linear infinite}
 @keyframes gridScroll{from{background-position:0 0}to{background-position:0 60px}}
 .cyber-bg #matrix{position:absolute;inset:0;width:100%;height:100%;opacity:.22;mix-blend-mode:screen}
-#stage{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 18px}
+#stage{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 18px;transition:max-width .25s ease}
+#stage.stage-select{max-width:1280px;padding:clamp(24px,4vh,48px) clamp(18px,4vw,52px)}
+#stage.stage-select>.panel{min-height:calc(100vh - 150px);display:flex;flex-direction:column;justify-content:center}
 .hud{position:sticky;top:0;z-index:50;background:rgba(3,6,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 14px}
 .hud-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
 .chip{display:flex;align-items:center;gap:8px;background:rgba(10,20,34,.85);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.8rem}
@@ -51,17 +53,23 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .maxscore-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:1rem;font-weight:900}
 .maxscore-total .ms-left{color:var(--txt)}
 .maxscore-total .ms-right{color:var(--amber);font-variant-numeric:tabular-nums}
-.temas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:22px 0}
-.tema-card{background:linear-gradient(160deg,rgba(19,31,51,.9),rgba(11,20,32,.9));border:1px solid var(--line);border-radius:18px;padding:18px 16px;cursor:pointer;transition:.25s;text-align:left;font-family:inherit;color:var(--txt);display:flex;flex-direction:column;gap:10px}
-.tema-card:hover{transform:translateY(-5px);border-color:var(--tc,var(--cyan))}
+.temas-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:30px 0}
+.tema-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(20,34,56,.94),rgba(8,16,29,.94));border:1px solid var(--line);border-radius:20px;padding:24px 22px;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s;text-align:left;font-family:inherit;color:var(--txt);display:flex;flex-direction:column;gap:14px;min-height:178px}
+.tema-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--tc,var(--cyan));opacity:.75}
+.tema-card:hover{transform:translateY(-5px);border-color:var(--tc,var(--cyan));box-shadow:0 18px 38px -25px var(--tc,var(--cyan))}
+.tema-card:focus-visible{outline:3px solid var(--tc,var(--cyan));outline-offset:3px}
 .tema-card.done{border-color:rgba(52,211,153,.5);background:linear-gradient(160deg,rgba(14,38,32,.85),rgba(10,26,24,.85))}
 .tema-head{display:flex;align-items:center;gap:12px}
-.tema-ico-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid var(--tc,rgba(34,211,238,.4))}
-.tema-card .tema-name{font-size:1.05rem;font-weight:900;color:var(--tc,var(--cyan))}
-.tema-card .tema-desc{font-size:.78rem;line-height:1.5;color:var(--muted)}
+.tema-ico-wrap{width:60px;height:60px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid var(--tc,rgba(34,211,238,.4))}
+.tema-card .tema-name{font-size:1.12rem;font-weight:900;color:var(--tc,var(--cyan))}
+.tema-card .tema-desc{font-size:.84rem;line-height:1.55;color:var(--muted)}
 .tema-card .tema-max{font-size:.72rem;color:var(--amber);font-weight:800}
 .tema-card .tag{font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid;align-self:flex-start}
 .tag-done{color:var(--green);border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.14)}
+.select-highlights{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 auto 6px}
+.select-highlight{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(10,20,34,.72);font-size:.76rem;font-weight:800;color:#cdd9ea}
+@media(max-width:900px){.temas-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.tema-card{min-height:160px;padding:20px}}
+@media(max-width:560px){#stage.stage-select{padding:18px 14px}.temas-grid{grid-template-columns:1fr;gap:12px;margin:22px 0}.tema-card{min-height:0;padding:17px}.tema-ico-wrap{width:50px;height:50px;font-size:1.7rem}.select-highlights{gap:7px}.select-highlight{font-size:.68rem;padding:8px 10px}}
 .btn{display:block;width:100%;font-family:inherit;font-size:.95rem;font-weight:800;padding:15px 20px;border-radius:14px;cursor:pointer;border:1px solid;transition:.2s;letter-spacing:.3px}
 .btn-primary{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(167,139,250,.22));border-color:rgba(34,211,238,.55);color:#c8ecf7}
 .btn-primary:hover{background:linear-gradient(135deg,rgba(34,211,238,.36),rgba(167,139,250,.36));transform:translateY(-2px)}
@@ -559,15 +567,15 @@ var G6 = [
 ];
 
 var GAMES = [
-  { id:'phishing',    name:'Phishing y estafas',  icon:'🎣', color:'#f87171', type:'clicker', layout:'cols-2', itemKind:'email',   data:G1, count:G1.length },
+  { id:'phishing',    name:'Phishing y estafas',  icon:'🎣', color:'#f87171', type:'clicker', layout:'cols-2', itemKind:'email',   data:G1, count:G1.length, max:150 },
   { id:'encriptado',  name:'Encriptado',          icon:'🔐', color:'#22d3ee', type:'quiz',                                       data:G2, count:G2.length },
   { id:'contrasenas', name:'Contraseñas',         icon:'🔑', color:'#a78bfa', type:'password',                                   data:[], count:1 },
   { id:'malware',     name:'Malware',             icon:'🦠', color:'#fb923c', type:'clicker', layout:'cols-4', itemKind:'file',    data:G4, count:G4.length },
   { id:'redes',       name:'Redes y WiFi',        icon:'📶', color:'#60a5fa', type:'config',                                     data:G5, count:G5.length },
-  { id:'ingSocial',   name:'Ingeniería social',   icon:'🧠', color:'#f472b6', type:'clicker', layout:'cols-2', itemKind:'message', data:G6, count:G6.length }
+  { id:'ingSocial',   name:'Ingeniería social',   icon:'🧠', color:'#f472b6', type:'clicker', layout:'cols-2', itemKind:'message', data:G6, count:G6.length, max:200 }
 ];
 GAMES.forEach(function(g){
-  if(g.type==='clicker') g.max = g.count * 20;
+  if(g.type==='clicker') g.max = g.max || g.count * 20;
   else if(g.type==='quiz') g.max = g.count * 20;
   else if(g.type==='config') g.max = g.count * 50;
   else if(g.type==='password') g.max = 200;
@@ -863,6 +871,7 @@ function getExt(name){
 }
 
 function render(){
+  stage.classList.toggle('stage-select', state.screen==='select');
   updateHUD();
   if(state.screen==='lobby') return renderLobby();
   if(state.screen==='select') return renderSelect();
@@ -909,13 +918,14 @@ function renderSelect(){
     return '<button class="tema-card '+(done?'done':'')+'" data-action="pick-game" data-val="'+i+'" style="--tc:'+g.color+'">' +
       '<div class="tema-head"><div class="tema-ico-wrap">'+g.icon+'</div><div>' +
       '<div class="tema-name">'+g.name+'</div><div class="tema-desc" style="margin-top:2px">'+desc+'</div></div></div>' +
-      '<div class="tema-max">Máx: '+g.max+' pts</div>' +
-      (done?'<span class="tag tag-done">✓ COMPLETADO</span>':'') +
+      '<div class="tema-max">Máximo · '+g.max+' pts</div>' +
+      (done?'<span class="tag tag-done">✓ COMPLETADO</span>':'<span class="tag" style="color:var(--tc);border-color:var(--tc);background:rgba(255,255,255,.04)">▶ JUGAR</span>') +
     '</button>';
   }).join('');
   stage.innerHTML = '<div class="panel">' +
     '<h1 class="title" style="font-size:clamp(1.3rem,3.6vw,1.8rem)">🎮 Elige un <span>minijuego</span></h1>' +
     '<p class="subtitle">Cada tema tiene su propia mecánica. Puedes jugarlos en cualquier orden.</p>' +
+    '<div class="select-highlights"><span class="select-highlight">🎯 6 retos</span><span class="select-highlight">🏆 Hasta '+TOTAL_MAX+' puntos</span><span class="select-highlight">🧭 En el orden que prefieras</span></div>' +
     '<div class="temas-grid">' + cards + '</div>' +
     (allDone ? '<button class="btn btn-final" data-action="go-final">🏆 Ver mi resultado final</button>' : '') +
     '<button class="btn btn-secondary" data-action="go-lobby">← Volver al inicio</button></div>';
@@ -1489,7 +1499,7 @@ function finishGame(){
       if(g.itemKind==='email') title = it.senderName + ' — ' + it.subject;
       else if(g.itemKind==='file') title = it.name;
       else if(g.itemKind==='message') title = (it.platformName || 'Mensaje') + ': ' + (it.message.substring(0,50)) + (it.message.length>50?'...':'');
-      if(rightDecision){ ok++; pts += 20; }
+      if(rightDecision){ ok++; pts += g.max / state.items.length; }
       else { ko++; pts -= 10; }
       review.push({
         head: title,
@@ -1500,7 +1510,7 @@ function finishGame(){
         correctAction: rightDecision ? null : (it.isBad ? 'Deberías haberlo marcado' : 'No debías marcarlo')
       });
     });
-    state.sessionOk = ok; state.sessionKo = ko; state.sessionScore = pts; state.review = review;
+    state.sessionOk = ok; state.sessionKo = ko; state.sessionScore = Math.round(pts); state.review = review;
   }
 
   if(g.type==='quiz'){
