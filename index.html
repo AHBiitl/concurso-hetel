@@ -140,7 +140,7 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .email-card.marked .email-unread-dot{background:var(--red)}
 .email-subject{font-weight:800;font-size:.93rem;color:var(--txt);flex:1}
 .email-card.marked .email-subject{color:#fca5a5}
-.email-body{font-size:.82rem;color:var(--muted);line-height:1.55;padding-left:54px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.email-body{font-size:.82rem;color:var(--muted);line-height:1.55;padding-left:54px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}
 
 .file-explorer{background:linear-gradient(180deg,rgba(3,6,13,.6),rgba(3,6,13,.4));border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:6px;box-shadow:0 8px 30px -20px #000 inset}
 .file-explorer-bar{background:linear-gradient(180deg,rgba(30,45,70,.7),rgba(15,25,42,.7));border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:.72rem}
@@ -369,6 +369,12 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast.good{color:var(--green);border-color:rgba(52,211,153,.5)}
 .toast.bad{color:var(--red);border-color:rgba(248,113,113,.5)}
+.boot-state,.boot-error{max-width:520px;margin:12vh auto 0;padding:24px;text-align:center;color:var(--muted)}
+.boot-state{font-weight:800}
+.boot-error{background:rgba(16,26,44,.94);border:1px solid rgba(248,113,113,.5);border-radius:18px}
+.offline-banner{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:rgba(120,53,15,.9);border-bottom:1px solid rgba(251,191,36,.5);color:#fde68a;font-size:.85rem;text-align:center}
+.offline-banner[hidden]{display:none}
+.offline-banner .btn{width:auto;padding:7px 14px;font-size:.78rem}
 </style>
 </head>
 <body>
@@ -388,7 +394,12 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
   </div>
 </header>
 
-<main id="stage"></main>
+<aside class="offline-banner" id="offline-banner" role="status" aria-live="polite" hidden>
+  <span id="offline-message">Sin conexión. El juego funciona sin internet y el progreso se guarda en este dispositivo.</span>
+  <button class="btn btn-secondary" type="button" data-action="retry-connection">Reintentar</button>
+</aside>
+
+<main id="stage"><div class="boot-state" role="status">Cargando...</div></main>
 
 <script>
 (function(){
@@ -786,16 +797,50 @@ function classifyPasswordStrength(score) {
    ============================================================ */
 
 var STORAGE_KEY = 'ciberjuegos_v1';
+var storageWarningShown = false;
 
 function saveState(){
   try {
+    var active = null;
+    if((state.screen === 'intro' || state.screen === 'game') && GAMES[state.gameIndex]){
+      var game = GAMES[state.gameIndex];
+      active = {
+        screen: state.screen,
+        gameIndex: state.gameIndex,
+        sessionOk: state.sessionOk,
+        sessionKo: state.sessionKo,
+        sessionScore: state.sessionScore,
+        review: state.review,
+        ended: state.ended
+      };
+      if(game.type === 'clicker'){
+        active.items = state.items.map(function(item){ return { marked: !!item.marked }; });
+      } else if(game.type === 'quiz'){
+        active.quizIndex = state.quizIndex;
+        active.quizSelected = state.quizSelected;
+        active.quizShuffled = state.quizShuffled;
+      } else if(game.type === 'config'){
+        active.configIndex = state.configIndex;
+        active.configToggles = state.configToggles;
+        active.configChecked = state.configChecked;
+        active.configTogglesInitialized = state.configTogglesInitialized;
+        active.configTogglesForIndex = state.configTogglesForIndex;
+        active.configShuffled = state.configShuffled;
+      }
+    }
     var toSave = {
       score: state.score,
       results: state.results,
-      done: state.done
+      done: state.done,
+      active: active
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch (e) { /* localStorage no disponible o lleno */ }
+  } catch (e) {
+    if(!storageWarningShown){
+      storageWarningShown = true;
+      toast('No se pudo guardar el progreso en este navegador.', 'bad');
+    }
+  }
 }
 
 function loadState(){
@@ -807,10 +852,128 @@ function loadState(){
       if (typeof data.score === 'number') state.score = data.score;
       if (data.results && typeof data.results === 'object') state.results = data.results;
       if (data.done && typeof data.done === 'object') state.done = data.done;
+      try {
+        restoreActiveState(data.active);
+      } catch (e) {
+        state.screen = 'lobby';
+        state.gameIndex = 0;
+        state.items = [];
+        state.ended = false;
+        state.sessionOk = 0;
+        state.sessionKo = 0;
+        state.sessionScore = 0;
+        state.review = [];
+        state.quizShuffled = null;
+        state.configShuffled = null;
+        state.configToggles = [];
+        state.configTogglesInitialized = false;
+        toast('No se pudo recuperar la partida guardada. Puedes empezar de nuevo.', 'bad');
+      }
       return true;
     }
   } catch (e) { /* datos corruptos → ignorar */ }
   return false;
+}
+
+function restoreActiveState(active){
+  if(!active || (active.screen !== 'intro' && active.screen !== 'game') ||
+      !Number.isInteger(active.gameIndex) || !GAMES[active.gameIndex]) return;
+
+  var game = GAMES[active.gameIndex];
+  if(active.screen === 'game'){
+    if(game.type === 'quiz' && (!Array.isArray(active.quizShuffled) ||
+        active.quizShuffled.length !== game.data.length ||
+        !Number.isInteger(active.quizIndex) || active.quizIndex < 0 || active.quizIndex >= game.data.length ||
+        !Number.isInteger(active.quizSelected) || active.quizSelected < -1 || active.quizSelected > 2)){
+      throw new Error('El progreso guardado del cuestionario no es válido.');
+    }
+    if(game.type === 'config' && (!Array.isArray(active.configShuffled) ||
+        active.configShuffled.length !== game.data.length ||
+        !Number.isInteger(active.configIndex) || active.configIndex < 0 || active.configIndex >= game.data.length)){
+      throw new Error('El progreso guardado de configuración no es válido.');
+    }
+  }
+  state.gameIndex = active.gameIndex;
+  state.screen = active.screen;
+  state.sessionOk = Number.isFinite(active.sessionOk) ? active.sessionOk : 0;
+  state.sessionKo = Number.isFinite(active.sessionKo) ? active.sessionKo : 0;
+  state.sessionScore = Number.isFinite(active.sessionScore) ? active.sessionScore : 0;
+  state.review = Array.isArray(active.review) ? active.review : [];
+  state.ended = active.ended === true;
+
+  if(game.type === 'clicker'){
+    state.items = game.data.map(function(item, index){
+      var copy = {};
+      for(var key in item) copy[key] = item[key];
+      copy.marked = !!(active.items && active.items[index] && active.items[index].marked);
+      return copy;
+    });
+  } else if(game.type === 'quiz' && Array.isArray(active.quizShuffled) &&
+      active.quizShuffled.length === game.data.length){
+    state.quizIndex = Number.isInteger(active.quizIndex) ? active.quizIndex : 0;
+    state.quizSelected = Number.isInteger(active.quizSelected) ? active.quizSelected : -1;
+    state.quizShuffled = active.quizShuffled.map(function(saved, index){
+      var original = game.data[index];
+      var remaining = original.options.slice();
+      if(!saved || !Array.isArray(saved.options) || saved.options.length !== remaining.length){
+        throw new Error('El progreso guardado del cuestionario no es válido.');
+      }
+      var options = saved.options.map(function(option){
+        var optionIndex = remaining.indexOf(option);
+        if(optionIndex === -1) throw new Error('El progreso guardado del cuestionario no es válido.');
+        remaining.splice(optionIndex, 1);
+        return option;
+      });
+      return {
+        tag: original.tag,
+        icon: original.icon,
+        question: original.question,
+        options: options,
+        correct: options.indexOf(original.options[original.correct]),
+        why: original.why
+      };
+    });
+  } else if(game.type === 'config' && Array.isArray(active.configShuffled) &&
+      active.configShuffled.length === game.data.length){
+    state.configIndex = Number.isInteger(active.configIndex) ? active.configIndex : 0;
+    state.configShuffled = active.configShuffled.map(function(saved, index){
+      var original = game.data[index];
+      var remaining = original.toggles.slice();
+      if(!saved || !Array.isArray(saved.toggles) || saved.toggles.length !== remaining.length){
+        throw new Error('El progreso guardado de configuración no es válido.');
+      }
+      var toggles = saved.toggles.map(function(savedToggle){
+        var toggleIndex = -1;
+        for(var i=0;i<remaining.length;i++){
+          if(remaining[i].label === savedToggle.label){ toggleIndex = i; break; }
+        }
+        if(toggleIndex === -1) throw new Error('El progreso guardado de configuración no es válido.');
+        return remaining.splice(toggleIndex, 1)[0];
+      });
+      return {
+        icon: original.icon,
+        level: original.level,
+        title: original.title,
+        desc: original.desc,
+        traps: original.traps,
+        toggles: toggles
+      };
+    });
+    state.configToggles = Array.isArray(active.configToggles) ? active.configToggles : [];
+    state.configChecked = active.configChecked === true;
+    state.configTogglesInitialized = active.configTogglesInitialized === true;
+    state.configTogglesForIndex = Number.isInteger(active.configTogglesForIndex) ? active.configTogglesForIndex : -1;
+    if(state.configTogglesInitialized && state.configTogglesForIndex === state.configIndex &&
+        state.configToggles.length !== state.configShuffled[state.configIndex].toggles.length){
+      throw new Error('El progreso guardado de configuración no es válido.');
+    }
+  } else if(game.type === 'password'){
+    state.passwordPhase = 'input';
+    state.passwordResult = null;
+    state.passwordDisplay = '';
+    state.passwordBestResult = null;
+    state.passwordBestScore = 0;
+  }
 }
 
 function clearPersistedState(){
@@ -887,12 +1050,25 @@ function getExt(name){
 function render(){
   stage.classList.toggle('stage-select', state.screen==='select');
   updateHUD();
+  saveState();
   if(state.screen==='lobby') return renderLobby();
   if(state.screen==='select') return renderSelect();
   if(state.screen==='intro') return renderIntro();
   if(state.screen==='game') return renderGame();
   if(state.screen==='end') return renderEnd();
   if(state.screen==='final') return renderFinal();
+}
+
+function updateConnectionStatus(){
+  var banner = $id('offline-banner');
+  if(banner) banner.hidden = navigator.onLine !== false;
+}
+
+function initializeApp(){
+  loadState();
+  updateHUD();
+  render();
+  updateConnectionStatus();
 }
 
 function renderLobby(){
@@ -1789,6 +1965,15 @@ function startCurrentGame(){
 
 function handleAction(action, val){
   switch(action){
+    case 'retry-boot': window.location.reload(); break;
+    case 'retry-connection':
+      if(navigator.onLine){
+        window.location.reload();
+      } else {
+        var offlineMessage = $id('offline-message');
+        if(offlineMessage) offlineMessage.textContent = 'Sin conexión todavía. Puedes seguir jugando; tu progreso se guarda en este dispositivo.';
+      }
+      break;
     case 'go-lobby': state.screen = 'lobby'; render(); break;
     case 'go-select': state.screen = 'select'; render(); break;
     case 'go-final': state.screen = 'final'; render(); break;
@@ -1841,10 +2026,19 @@ document.addEventListener('input', function(e){
   }
 });
 
-// Cargar estado guardado al arrancar
-loadState();
-updateHUD();
-render();
+window.addEventListener('offline', updateConnectionStatus);
+window.addEventListener('online', function(){
+  updateConnectionStatus();
+  toast('Conexión restablecida', 'good');
+});
+
+try {
+  initializeApp();
+} catch (e) {
+  stage.innerHTML = '<div class="boot-error" role="alert"><h1 class="title">No se pudo cargar el juego</h1>' +
+    '<p class="subtitle">Comprueba la conexión e inténtalo de nuevo.</p>' +
+    '<button class="btn btn-primary" data-action="retry-boot">Reintentar</button></div>';
+}
 </script>
 </body>
 </html>
