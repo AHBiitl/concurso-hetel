@@ -23,6 +23,10 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 #stage.stage-select>.panel{min-height:calc(100vh - 150px);display:flex;flex-direction:column;justify-content:center}
 .hud{position:sticky;top:0;z-index:50;background:rgba(3,6,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:10px 14px}
 .hud-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.language-control{display:flex;align-items:center;gap:8px;background:rgba(10,20,34,.85);border:1px solid var(--line);border-radius:999px;padding:5px 10px}
+.language-control label{color:var(--muted);font-size:.65rem;font-weight:900;letter-spacing:1px}
+.language-control select{font:inherit;font-size:.78rem;font-weight:800;color:var(--txt);background:#0a1422;border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer}
+.language-control select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .chip{display:flex;align-items:center;gap:8px;background:rgba(10,20,34,.85);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.8rem}
 .chip .lbl{color:var(--muted);font-weight:800;font-size:.6rem;letter-spacing:1.3px}
 .chip .val{font-weight:900;font-variant-numeric:tabular-nums;font-size:.95rem}
@@ -622,6 +626,13 @@ button:disabled{opacity:.72}
 
 <header class="hud">
   <div class="hud-inner">
+    <div class="language-control">
+      <label id="language-label" for="language-select">IDIOMA</label>
+      <select id="language-select" aria-labelledby="language-label">
+        <option value="es">Castellano</option>
+        <option value="eu">Euskara</option>
+      </select>
+    </div>
     <div class="chip"><span class="lbl">PUNTOS</span><span class="val" id="hudScore">0</span></div>
     <div class="chip"><span class="lbl">TEMA</span><span class="val" id="hudTema">—</span></div>
     <div class="chip"><span class="lbl">ESTADO</span><span class="val" id="hudQ">—</span></div>
@@ -850,6 +861,576 @@ var TIPS = {
   redes: ['Cambia la contraseña por defecto de tu router y actualiza su firmware.','Pon los dispositivos inteligentes en una red de invitados separada.','Desconfía de opciones que suenan a "mejorar velocidad" a costa de seguridad.'],
   ingSocial: ['Desconfía de la urgencia emocional.','Verifica por otro canal cualquier petición de dinero.','No publiques en redes que estás de vacaciones mientras estás fuera.']
 };
+
+var LANGUAGE_KEY = 'ciberjuegos_language';
+var currentLanguage = 'es';
+var BASQUE = {
+  'CiberJuegos · Aprende ciberseguridad jugando':'CiberJokoak · Ikasi zibersegurtasuna jolastuz',
+  'CiberJuegos':'CiberJokoak',
+  'Aprende ciberseguridad jugando':'Ikasi zibersegurtasuna jolastuz',
+  'IDIOMA':'HIZKUNTZA',
+  'TEMAS':'GAIAK',
+  'PUNTOS':'PUNTUAK',
+  'TEMA':'GAIA',
+  'ESTADO':'EGOERA',
+  'Sin conexión. El juego funciona sin internet y el progreso se guarda en este dispositivo.':'Konexiorik ez. Jolasak Internetik gabe funtzionatzen du, eta aurrerapena gailu honetan gordetzen da.',
+  'Sin conexión todavía. Puedes seguir jugando; tu progreso se guarda en este dispositivo.':'Oraindik konexiorik ez dago. Jokatzen jarrai dezakezu; aurrerapena gailu honetan gordeko da.',
+  'Conexión restablecida':'Konexioa berrezarri da',
+  'Reintentar':'Saiatu berriro',
+  'Cargando...':'Kargatzen...',
+  'No se pudo cargar el juego':'Ezin izan da jolasa kargatu',
+  'Comprueba la conexión e inténtalo de nuevo.':'Egiaztatu konexioa eta saiatu berriro.',
+  'Seis minijuegos educativos para aprender ciberseguridad a un nivel accesible.':'Zibersegurtasuna modu errazean ikasteko sei minijoko didaktiko.',
+  'CÓMO FUNCIONA':'NOLA FUNTZIONATZEN DUEN',
+  'Hay ':'Badira ',
+  ' minijuegos':' minijoko',
+  ', cada uno con su propia mecánica y su propio tema.':', bakoitza bere mekanika eta gaiarekin.',
+  'En los juegos de ':' ',
+  'marcar un grupo':'multzo bat markatzeko',
+  ', tú decides cuándo has terminado: pulsa ':' jokoetan, zuk erabakitzen duzu noiz amaitu: sakatu ',
+  'Finalizar':'Amaitu',
+  ' cuando creas que ya has marcado todas las respuestas correctas.':' erantzun zuzen guztiak markatu dituzula uste duzunean.',
+  'Cada respuesta correcta suma y cada fallo resta. Los puntos se van acumulando.':'Erantzun zuzen bakoitzak puntuak gehitzen ditu, eta akats bakoitzak kendu. Puntuak pilatzen joaten dira.',
+  'Si repites un minijuego, tu puntuación anterior ':'Minijoko bat errepikatzen baduzu, aurreko puntuazioa ',
+  'se descuenta al empezar':'hasieran kenduko da',
+  ': solo cuenta la última puntuación.':'; azken puntuazioa bakarrik hartuko da kontuan.',
+  'Al completar los 6 juegos, verás tu ':'6 jokoak amaitzean, zure ',
+  'resultado final':'azken emaitza',
+  ' con un análisis personalizado.':' eta azterketa pertsonalizatua ikusiko dituzu.',
+  'Tu progreso se ':'Zure aurrerapena automatikoki ',
+  'guarda automáticamente':'gordetzen da',
+  ' en este navegador. Puedes cerrar y volver cuando quieras.':' nabigatzaile honetan. Nahi duzunean itxi eta geroago itzul zaitezke.',
+  'PUNTUACIÓN MÁXIMA POSIBLE':'LOR DAITEKEEN GEHIENEKO PUNTUAZIOA',
+  'TOTAL':'GUZTIRA',
+  ' pts':' puntu',
+  'Ver mi resultado final':'Ikusi nire azken emaitza',
+  'Empezar a jugar':'Hasi jolasten',
+  'Reiniciar progreso guardado':'Berrezarri gordetako aurrerapena',
+  'Elige un ':'Aukeratu ',
+  'minijuego':'minijoko bat',
+  'minijuegos':'minijoko',
+  'Cada tema tiene su propia mecánica. Puedes jugarlos en cualquier orden.':'Gai bakoitzak bere mekanika du. Edozein ordenatan joka ditzakezu.',
+  '6 retos':'6 erronka',
+  'Hasta ':'Gehienez ',
+  'En el orden que prefieras':'Nahi duzun ordenan',
+  ' elementos para marcar':' elementu markatzeko',
+  ' preguntas':' galdera',
+  'Analiza una contraseña localmente':'Aztertu pasahitz bat gailuan',
+  ' escenarios':' agertoki',
+  'Máximo · ':'Gehienez · ',
+  '✓ COMPLETADO':'✓ AMAITUTA',
+  '▶ JUGAR':'▶ JOLASTU',
+  'Volver al inicio':'Itzuli hasierara',
+  'Cambiar de minijuego':'Aldatu minijokoa',
+  'Máximo: ':'Gehienez: ',
+  'Máximo':'Gehienez',
+  '¡Jugar!':'Jolastu!',
+  'Ya has jugado a este minijuego.':'Dagoeneko jokatu duzu minijoko honetan.',
+  'Al empezar de nuevo, tus ':'Berriro hasten zarenean, aurreko ',
+  ' pts anteriores se descontarán':' puntu kenduko dira',
+  'correos fraudulentos de phishing':'phishing-mezu iruzurtiak',
+  'archivos peligrosos':'fitxategi arriskutsuak',
+  'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son ':'Hainbat elementu ikusiko dituzu. Sakatu hauetakoak direla uste dituzun guztiak: ',
+  '. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa ':' . Nahi adina markatu eta desmarka ditzakezu. Aukeraketa eginda duzunean, sakatu ',
+  'Finalizar y ver resultado':'Amaitu eta ikusi emaitza',
+  'Phishing':'Phishinga',
+  ' significa suplantación: un engaño que se hace pasar por una persona o entidad de confianza para robar datos.':' identitate-ordeztea da: datuak lapurtzeko, konfiantzazko pertsona edo erakunde baten itxurak egiten dituen iruzurra.',
+  'Malware':'Malwarea',
+  ' viene de ':' hitza ',
+  ' y significa programa malicioso, creado para dañar un dispositivo o robar información.':' esamoldetik dator, eta gailu bati kalte egiteko edo informazioa lapurtzeko sortutako programa gaiztoa esan nahi du.',
+  'Lee cada pregunta con calma y elige la opción correcta entre ':'Irakurri galdera bakoitza lasai eta aukeratu aukera zuzena hauen artean: ',
+  '. ':' . ',
+  'Las opciones se barajan en cada partida':'Aukeren ordena partida bakoitzean nahasten da',
+  'Escribe una contraseña ficticia y pulsa ':'Idatzi fikziozko pasahitz bat eta sakatu ',
+  '. El análisis se calcula en este dispositivo: el texto no se envía al servidor ni a servicios externos. Verás una puntuación sobre 200, los puntos fuertes, los patrones previsibles y recomendaciones para mejorarla.':' . Azterketa gailu honetan egiten da: testua ez zaio zerbitzariari edo kanpoko zerbitzuei bidaltzen. 200 puntutik zenbateko puntuazioa duzun, alderdi sendoak, aurreikus daitezkeen patroiak eta hobetzeko gomendioak ikusiko dituzu.',
+  'No uses una contraseña real.':'Ez erabili benetako pasahitzik.',
+  'La puntuación es orientativa, no una garantía de seguridad. Puedes probar varias contraseñas ficticias; al finalizar se guardará tu ':'Puntuazioa orientagarria da, ez du segurtasuna bermatzen. Hainbat fikziozko pasahitz proba ditzakezu; amaitzean zure ',
+  'mejor resultado':'emaitzarik onena',
+  'Vas a ver ':'',
+  ' escenarios reales':' benetako agertoki ikusiko dituzu',
+  ' de dificultad creciente. En cada uno, activa los interruptores que correspondan a ':' eta zailtasuna handituz joango da. Bakoitzean, aktibatu ',
+  'buenas prácticas de seguridad':'segurtasun-praktika onak',
+  ' y deja desactivados los que sean ':' eta utzi desaktibatuta ',
+  'malas prácticas':'praktika txarrak',
+  '.':' .',
+  '¡Cuidado con las trampas!':'Kontuz tranpekin!',
+  ' Algunas opciones suenan a buena práctica (mejorar velocidad, conectar fácil) pero son ':' Aukera batzuek praktika onak dirudite (abiadura hobetzea, erraz konektatzea), baina ',
+  'malas ideas de seguridad':'segurtasunaren ikuspegitik ideia txarrak',
+  'Al comprobar, ':'Egiaztatzean, ',
+  'te explicaremos por qué cada respuesta es correcta o incorrecta':'erantzun bakoitza zergatik den zuzena edo okerra azalduko dizugu',
+  'Ya has jugado a este minijuego. Al empezar de nuevo, tus ':'Dagoeneko jokatu duzu minijoko honetan. Berriro hasten zarenean, aurreko ',
+  ' y solo contará la nueva puntuación.':' eta puntuazio berria bakarrik hartuko da kontuan.',
+  'Bandeja de entrada':'Sarrerako ontzia',
+  ' marcados':' markatuta',
+  'Marcados':'Markatuta',
+  'URGENTE':'PREMIAZKOA',
+  '📁 Mis descargas / Archivos recibidos':'📁 Nire deskargak / Jasotako fitxategiak',
+  ' programa':' programa',
+  ' macros':' makroak',
+  ' documento':' dokumentua',
+  ' imagen':' irudia',
+  ' audio':' audioa',
+  ' vídeo':' bideoa',
+  'Estás revisando tu carpeta de descargas. Marca los archivos que ':'Deskargen karpeta aztertzen ari zara. Markatu ',
+  'NO abrirías bajo ningún concepto':'inolaz ere irekiko ez zenituzkeen fitxategiak',
+  '. Fíjate en el ':' . Begiratu ',
+  'nombre completo':'izen osoa',
+  'extensión':'luzapena',
+  'origen':'jatorria',
+  'Estás revisando tu bandeja de entrada. Marca los correos que creas que son ':'Sarrerako ontzia aztertzen ari zara. Markatu ',
+  'PHISHING':'PHISHING',
+  '. Mira con calma: la ':' direla uste dituzun mezuak. Begiratu arretaz: ',
+  'dirección real del remitente':'bidaltzailearen benetako helbidea',
+  ', la ':' eta ',
+  'hora':'ordua',
+  ', si tiene prioridad urgente y si adjunta archivos raros.':', premiazkoa den eta fitxategi susmagarririk erantsi duen.',
+  'Marca los mensajes que creas que son ':'Markatu ',
+  'ESTAFA':'IRUZUR',
+  '. Fíjate en quién envía, la urgencia, si piden dinero o datos raros.':' direla uste dituzun mezuak. Begiratu nork bidaltzen dituen, premia sortzen duten eta dirua edo datu susmagarriak eskatzen dituzten.',
+  'Aciertos':'Asmatutakoak',
+  'Fallos':'Akatsak',
+  'Barajado':'Nahastuta',
+  '¡Correcto!':'Zuzena!',
+  'La respuesta correcta era la ':'Erantzun zuzena hau zen: ',
+  'Siguiente pregunta →':'Hurrengo galdera →',
+  'Terminar juego':'Amaitu jolasa',
+  'Activado':'Aktibatuta',
+  'Desactivado':'Desaktibatuta',
+  'ACTIVADO':'AKTIBATUTA',
+  'DESACTIVADO':'DESAKTIBATUTA',
+  'Activaste':'Aktibatu duzu',
+  'Dejaste desactivado':'Desaktibatuta utzi duzu',
+  'debería estar ACTIVADO':'aktibatuta egon beharko luke',
+  'debería estar DESACTIVADO':'desaktibatuta egon beharko luke',
+  'Esta opción es ':'Aukera hau ',
+  'buena práctica':'praktika ona',
+  'mala práctica':'praktika txarra',
+  ' de seguridad.':' segurtasunerako.',
+  ' era lo correcto. ':' egin duzu, eta zuzena zen. ',
+  ', pero ':' egin duzu, baina ',
+  'Escenario':'Agertokia',
+  ' trampa':' tranpa',
+  ' activadas':' aktibatuta',
+  'Ajustes activados':'Ezarpen aktibatuak',
+  'Comprobar configuración':'Egiaztatu konfigurazioa',
+  'Ajustes correctos: ':'Ezarpen zuzenak: ',
+  '¡Escenario perfecto! ':'Agertoki bikaina! ',
+  'EXPLICACIÓN DE TUS RESPUESTAS':'ZURE ERANTZUNEN AZALPENA',
+  'Longitud':'Luzera',
+  'Variedad de caracteres':'Karaktere-aniztasuna',
+  'Patrones previsibles':'Aurreikus daitezkeen patroiak',
+  'Bonificaciones por longitud y frase':'Luzeragatik eta esaldiagatik lortutako hobariak',
+  'Contraseña analizada (oculta)':'Aztertutako pasahitza (ezkutuan)',
+  'Seguridad':'Segurtasuna',
+  'SECUENCIA DE EVALUACIÓN':'EBALUAZIO-SEKUENTZIA',
+  'Puntuación base: ':'Oinarrizko puntuazioa: ',
+  'Es una guía educativa; no garantiza seguridad ni comprueba filtraciones.':'Hezkuntza-gida bat da; ez du segurtasuna bermatzen, eta ez du filtraziorik egiaztatzen.',
+  'PUNTOS FUERTES':'ALDERDI SENDOAK',
+  'PUNTOS DÉBILES':'ALDERDI AHULAK',
+  'RECOMENDACIONES':'GOMENDIOAK',
+  'El análisis se realiza localmente en este dispositivo. La contraseña no se envía a ningún servidor ni se guarda en tu progreso. Usa solo una contraseña ficticia.':'Azterketa gailu honetan egiten da. Pasahitza ez zaio zerbitzaririk bidaltzen eta ez da aurrerapenean gordetzen. Erabili fikziozko pasahitz bat soilik.',
+  'El análisis se ha realizado en este dispositivo. La contraseña no se envía a ningún servidor ni se guarda en tu progreso.':'Azterketa gailu honetan egin da. Pasahitza ez zaio zerbitzaririk bidaltzen eta ez da aurrerapenean gordetzen.',
+  'Tu mejor resultado hasta ahora: ':'Orain arteko emaitzarik onena: ',
+  'Escribe una contraseña ficticia...':'Idatzi fikziozko pasahitz bat...',
+  'Mostrar/ocultar contraseña':'Erakutsi/ezkutatu pasahitza',
+  'Mostrar u ocultar contraseña':'Erakutsi edo ezkutatu pasahitza',
+  'Contraseña ficticia para análisis local':'Gailuan aztertzeko fikziozko pasahitza',
+  'Contraseña analizada, oculta':'Aztertutako pasahitza, ezkutuan',
+  ' caracteres':' karaktere',
+  'Analizar contraseña':'Aztertu pasahitza',
+  'Probar otra contraseña':'Probatu beste pasahitz bat',
+  'Mejor':'Onena',
+  'crea una':'sortu bat',
+  'Contraseña analizada':'Aztertutako pasahitza',
+  'Nivel':'Maila',
+  'Puntuación: ':'Puntuazioa: ',
+  ' puntos':' puntu',
+  'No analizaste ninguna contraseña':'Ez duzu pasahitzik aztertu',
+  'Sin datos':'Daturik ez',
+  'No respondiste':'Ez duzu erantzun',
+  'Correcto':'Zuzena',
+  'Incorrecto':'Okerra',
+  'Marcaste':'Markatu duzu',
+  'No marcaste':'Ez duzu markatu',
+  'Deberías haberlo marcado':'Markatu egin behar zenuen',
+  'No debías marcarlo':'Ez zenuen markatu behar',
+  'Esc. ':'Ag. ',
+  ' debería estar ACTIVADO':' aktibatuta egon beharko luke',
+  ' debería estar DESACTIVADO':' desaktibatuta egon beharko luke',
+  'Pregunta ':'Galdera ',
+  'Elegiste ':'Hau aukeratu duzu: ',
+  'La correcta era ':'Zuzena hau zen: ',
+  'Quedan ':'Geratzen dira ',
+  ' pregunta(s) sin responder. ¿Seguro que quieres finalizar? Las preguntas no respondidas contarán como fallo.':' erantzun gabeko galdera. Ziur amaitu nahi duzula? Erantzun gabeko galderak akastzat hartuko dira.',
+  '¿Seguro que quieres borrar todo tu progreso guardado? Esta acción no se puede deshacer.':'Ziur gordetako aurrerapen guztia ezabatu nahi duzula? Ekintza hau ezin da desegin.',
+  'Progreso reiniciado':'Aurrerapena berrezarri da',
+  'No se pudo guardar el progreso en este navegador.':'Ezin izan da aurrerapena nabigatzaile honetan gorde.',
+  'No se pudo recuperar la partida guardada. Puedes empezar de nuevo.':'Ezin izan da gordetako partida berreskuratu. Berriro has zaitezke.',
+  'No se pudo guardar el idioma en este navegador.':'Ezin izan da hizkuntza nabigatzaile honetan gorde.',
+  'COMPLETADO':'AMAITUTA',
+  'DESGLOSE POR TEMA':'GAIAREN ARABERAKO BANAKETA',
+  'ANÁLISIS PERSONALIZADO':'AZTERKETA PERTSONALIZATUA',
+  'CONSEJOS PARA TU DÍA A DÍA':'EGUNEROKO AHOLKUAK',
+  'PUNTUACIÓN FINAL':'AZKEN PUNTUAZIOA',
+  'JUEGOS':'JOKOAK',
+  'ACIERTOS':'ASMATUTAKOAK',
+  'FALLOS':'AKATSAK',
+  'PRECISIÓN':'ZEHAZTASUNA',
+  'PTS DEL JUEGO':'JOKOAREN PUNTUAK',
+  'REVISIÓN COMPLETA':'BERRIKUSPEN OSOA',
+  'correctas':'zuzen',
+  'incorrectas':'oker',
+  '🎯 No hay elementos que revisar.':'🎯 Ez dago berrikusi beharreko elementurik.',
+  'Elegir otro minijuego':'Aukeratu beste minijoko bat',
+  'Repetir este juego':'Errepikatu joko hau',
+  'Repetir minijuegos':'Errepikatu minijokoak',
+  'Sigue practicando':'Jarraitu praktikatzen',
+  '¡Excelente! Dominas el tema':'Bikain! Gaia menperatzen duzu',
+  'Buen trabajo, repasa lo fallado':'Ongi egina, berrikusi huts egindakoa',
+  'Experto en ciberseguridad':'Zibersegurtasunean aditua',
+  'Usuario concienciado':'Erabiltzaile kontzientziatua',
+  'Aprendiz avanzado':'Ikasle aurreratua',
+  'Aprendiz en progreso':'Ikasten ari dena',
+  'Necesitas repasar lo básico':'Oinarrizko kontzeptuak berrikusi behar dituzu',
+  'Tienes un perfil de aprendiz con buen criterio en algunos temas. ':'Ikasle ona zara gai batzuetan. ',
+  'Destacas especialmente en ':'Bereziki nabarmentzen zara gai hauetan: ',
+  '. En cambio, los temas de ':' . Aldiz, gai hauek ',
+  ' son tus puntos débiles.':' dira zure alderdi ahulak.',
+  '¡Excelente trabajo! Destacas con claridad en ':'Lan bikaina! Argi eta garbi nabarmentzen zara gai hauetan: ',
+  ' completado!':' amaituta!',
+  'Aun así, no descuides ':'Hala ere, ez ahaztu ',
+  'Mantienes un nivel alto en todos los temas.':'Maila altua duzu gai guztietan.',
+  'Todavía te queda camino por recorrer, pero eso es bueno: tienes mucho margen de mejora. ':'Oraindik baduzu zer ikasi, eta hori ona da: asko hobe dezakezu. ',
+  'Los temas que más te cuestan son ':'Gehien kostatzen zaizkizun gaiak hauek dira: ',
+  'Mantienes un nivel ':'Maila ',
+  'medio y constante':'ertain eta egonkorra',
+  ' en todos los temas. Repite los juegos fijándote en las explicaciones.':' duzu gai guztietan. Errepikatu jokoak, azalpenetan arreta jarriz.',
+  'Antes de hacer clic en un correo, mira la dirección real del remitente.':'Mezu batean klik egin aurretik, begiratu bidaltzailearen benetako helbidea.',
+  'Si un mensaje mete prisa, sospecha.':'Mezu batek presaka ibiltzera bultzatzen bazaitu, susmatu.',
+  'Cuando dudes, entra tú mismo a la web oficial escribiendo la dirección a mano.':'Zalantza baduzu, sartu webgune ofizialean helbidea eskuz idatzita.',
+  'Busca siempre el candado 🔒 antes de escribir contraseñas o datos de tarjeta.':'Bilatu beti 🔒 giltzarrapoa pasahitzak edo txartelaren datuak idatzi aurretik.',
+  'En redes WiFi públicas, usa VPN o los datos móviles para lo importante.':'WiFi sare publikoetan, erabili VPNa edo datu mugikorrak gauza garrantzitsuetarako.',
+  'Prefiere apps con cifrado de extremo a extremo.':'Aukeratu muturretik muturrerako zifratzea duten aplikazioak.',
+  'Usa una contraseña distinta para cada servicio.':'Erabili pasahitz desberdina zerbitzu bakoitzean.',
+  'Cuanto más larga, mejor: una frase de 5-6 palabras es más fuerte.':'Zenbat eta luzeagoa, hobe: 5-6 hitzeko esaldia sendoagoa da.',
+  'Activa la verificación en dos pasos (2FA) sobre todo en tu correo electrónico.':'Aktibatu bi urratseko egiaztapena (2FA), batez ere zure posta elektronikoan.',
+  'Nunca descargues software pirata.':'Ez deskargatu inoiz software piratarik.',
+  'No conectes USBs que encuentres ni abras adjuntos inesperados.':'Ez konektatu aurkitutako USB memoriarik eta ez ireki ustekabeko eranskinik.',
+  'Mantén el sistema y las apps actualizadas.':'Mantendu sistema eta aplikazioak eguneratuta.',
+  'Cambia la contraseña por defecto de tu router y actualiza su firmware.':'Aldatu bideratzailearen lehenetsitako pasahitza eta eguneratu haren firmwarea.',
+  'Pon los dispositivos inteligentes en una red de invitados separada.':'Jarri gailu adimendunak gonbidatuentzako sare bereizi batean.',
+  'Desconfía de opciones que suenan a "mejorar velocidad" a costa de seguridad.':'Ez fidatu segurtasunaren kontura "abiadura hobetzea" agintzen duten aukerez.',
+  'Desconfía de la urgencia emocional.':'Ez fidatu presio emozionalaz.',
+  'Verifica por otro canal cualquier petición de dinero.':'Egiaztatu beste bide batetik diru-eskaera oro.',
+  'No publiques en redes que estás de vacaciones mientras estás fuera.':'Ez argitaratu sare sozialetan oporretan zaudela etxetik kanpo zauden bitartean.',
+  'Tu cuenta ha sido bloqueada':'Zure kontua blokeatu egin da',
+  'Detectamos actividad sospechosa en tu cuenta. Pulsa este enlace en 24 h para verificar tu identidad o bloquearemos tu cuenta permanentemente.':'Jarduera susmagarria antzeman dugu zure kontuan. Sakatu esteka hau 24 orduko epean zure nortasuna egiaztatzeko; bestela, kontua behin betiko blokeatuko dugu.',
+  'El banco de verdad usa "bbva.es". Este dominio añade palabras raras con guiones para parecer oficial.':'Benetako bankuak "bbva.es" erabiltzen du. Domeinu honek hitz arraroak eta marratxoak gehitzen ditu ofiziala dela emateko.',
+  'Nuevo inicio de sesión en tu cuenta':'Saio-hasiera berria zure kontuan',
+  'Hemos detectado un nuevo inicio de sesión desde Madrid (España). Si no fuiste tú, cambia tu contraseña desde la web oficial.':'Saio-hasiera berri bat antzeman dugu Madrildik (Espainia). Zu izan ez bazara, aldatu pasahitza webgune ofizialean.',
+  'El remitente es el real de GitHub. No pide datos ni enlaces raros.':'Bidaltzailea GitHub-eko benetakoa da. Ez du daturik edo esteka susmagarririk eskatzen.',
+  'Verifica tu cuenta urgente':'Egiaztatu zure kontua berehala',
+  'Tu cuenta está limitada. Haz clic en el enlace para restaurar el acceso. Este enlace caduca en 24 horas.':'Zure kontua mugatuta dago. Egin klik estekan sarbidea berrezartzeko. Esteka 24 ordutan iraungiko da.',
+  '"paypa1" con un 1 en lugar de la "l" de PayPal. Además llegó a las 3:47 de la madrugada.':'"paypa1" helbidean 1 zenbakia erabili dute PayPal-en "l" letraren ordez. Gainera, goizeko 3:47an iritsi da.',
+  'Recordatorio: formación de seguridad':'Gogorarazpena: segurtasun-prestakuntza',
+  'Recuerda que el próximo jueves a las 10 h tienes la sesión obligatoria de formación en ciberseguridad.':'Gogoratu datorren ostegunean, 10:00etan, zibersegurtasuneko prestakuntza-saio derrigorrezkoa duzula.',
+  'Viene de tu propia empresa, no mete prisa y no pide datos.':'Zure enpresatik dator, ez du presarik sartzen eta ez du daturik eskatzen.',
+  'Tu paquete no ha podido entregarse':'Ezin izan da zure paketea entregatu',
+  'Tu paquete está retenido en la oficina. Pulsa bit.ly/entrega-paq para actualizar tu dirección y pagar 1,50 € de gastos.':'Zure paketea bulegoan dago atxikita. Sakatu bit.ly/entrega-paq helbidea eguneratzeko eta 1,50 €-ko gastuak ordaintzeko.',
+  'Correos NUNCA usa enlaces acortados (bit.ly) ni cobra 1,50 € por email.':'Correosek EZ ditu inoiz esteka laburtuak (bit.ly) erabiltzen, eta ez du 1,50 € kobratzen posta elektronikoz.',
+  'Acceso desde nuevo dispositivo':'Sarbidea gailu berri batetik',
+  'Se ha accedido a tu cuenta desde un dispositivo nuevo. Si eres tú, ignora este mensaje. Si no, contacta por la app oficial.':'Zure kontura gailu berri batetik sartu dira. Zu izan bazara, ez ikusi mezuari. Bestela, jarri harremanetan aplikazio ofizialaren bidez.',
+  'El dominio es el correcto y no te pide datos.':'Domeinua zuzena da, eta ez dizu daturik eskatzen.',
+  'Actualiza tu contraseña de VPN':'Eguneratu VPNaren pasahitza',
+  'Por motivos de seguridad debes actualizar tu contraseña de VPN HOY. Introduce tu contraseña actual en el formulario adjunto.':'Segurtasun-arrazoiak direla eta, GAUR eguneratu behar duzu VPNaren pasahitza. Sartu uneko pasahitza erantsitako formularioan.',
+  'El dominio NO es el de tu empresa. Y pide tu contraseña actual.':'Domeinua EZ da zure enpresarena. Gainera, uneko pasahitza eskatzen dizu.',
+  'Tu pedido ha sido enviado':'Zure eskaera bidali da',
+  'Tu pedido #123-456 ha salido del almacén. Podrás seguirlo desde "Mis pedidos" en la web oficial.':'#123-456 eskaera biltegitik atera da. Webgune ofizialean, "Nire eskaerak" atalean jarrai dezakezu.',
+  'Remitente correcto, no pide datos.':'Bidaltzailea zuzena da, eta ez du daturik eskatzen.',
+  'Cuando ves el candado 🔒 en la barra del navegador, ¿qué significa?':'Nabigatzailearen barran 🔒 giltzarrapoa ikusten duzunean, zer esan nahi du?',
+  'Que la web carga más rápido':'Webgunea azkarrago kargatzen dela',
+  'Que la conexión está cifrada y nadie puede leer lo que envías':'Konexioa zifratuta dagoela eta inork ezin duela bidaltzen duzuna irakurri',
+  'Que la web es gratis y sin anuncios':'Webgunea doakoa dela eta iragarkirik ez duela',
+  'El candado significa que la conexión usa HTTPS: todo lo que envías viaja cifrado.':'Giltzarrapoak konexioak HTTPS erabiltzen duela esan nahi du: bidaltzen duzun guztia zifratuta doa.',
+  '¿Para qué sirve la contraseña del WiFi de casa?':'Zertarako balio du etxeko WiFiaren pasahitzak?',
+  'Solo para que no la use el vecino':'Bizilagunak erabil ez dezan bakarrik',
+  'Para que el tráfico entre tus dispositivos y el router vaya cifrado':'Zure gailuen eta bideratzailearen arteko trafikoa zifratuta joateko',
+  'Para que el WiFi sea más rápido':'WiFi-a azkarragoa izan dadin',
+  'Además de evitar que otros entren, la contraseña activa el cifrado WPA2 o WPA3.':'Beste batzuk sar ez daitezen eragozteaz gain, pasahitzak WPA2 edo WPA3 zifratzea aktibatzen du.',
+  'WhatsApp dice que usa "cifrado de extremo a extremo". ¿Qué protege?':'WhatsAppek "muturretik muturrerako zifratzea" erabiltzen duela dio. Zer babesten du?',
+  'El contenido de los mensajes: solo tú y quien los recibe podéis leerlos':'Mezuen edukia: zuk eta hartzaileak bakarrik irakur ditzakezue',
+  'El precio de los datos':'Datuen prezioa',
+  'La velocidad de envío':'Bidalketa-abiadura',
+  'El mensaje se cierra con llave en tu móvil y solo se abre en el del receptor.':'Mezua zure mugikorrean giltzaz ixten da, eta hartzailearen gailuan bakarrik irekitzen.',
+  '¿Cuál es la diferencia principal entre "http://" y "https://"?':'Zein da "http://" eta "https://" arteko alde nagusia?',
+  'HTTPS es más moderna y rápida':'HTTPS modernoagoa eta azkarragoa da',
+  'HTTPS cifra la conexión; HTTP la deja sin cifrar':'HTTPSek konexioa zifratzen du; HTTPk ez',
+  'HTTP es solo para vídeos y HTTPS para bancos':'HTTP bideoetarako bakarrik da, eta HTTPS bankuetarako',
+  'La "s" final significa "seguro": la conexión va cifrada con TLS.':'Azken "s" letrak "segurua" esan nahi du: konexioa TLS bidez zifratzen da.',
+  'Cuando creas una cuenta, ¿qué guarda normalmente el servidor?':'Kontu bat sortzen duzunean, zer gordetzen du normalean zerbitzariak?',
+  'Tu contraseña tal cual, en texto plano':'Zure pasahitza bere horretan, testu arruntean',
+  'Una especie de "huella digital" (hash) que no se puede revertir fácilmente':'Erraz leheneratu ezin den "hatz-marka" moduko bat (hash-a)',
+  'Solo tu correo electrónico':'Zure helbide elektronikoa bakarrik',
+  'Los servicios serios guardan un hash de tu contraseña, no la contraseña en sí.':'Zerbitzu fidagarriek pasahitzaren hash-a gordetzen dute, ez pasahitza bera.',
+  'PDF normal, sin macros.':'PDF arrunta, makrorik gabe.',
+  'Doble extensión: parece PDF pero es ejecutable.':'Luzapen bikoitza: PDFa dirudi, baina exekutagarria da.',
+  'Imagen normal.':'Irudi arrunta.',
+  'Software pirata. Vector de troyanos.':'Software pirata. Troiarrak edukitzeko arriskua.',
+  'Hoja de cálculo normal.':'Kalkulu-orri arrunta.',
+  'Extensión .xlsm con macros.':'.xlsm luzapena, makroduna.',
+  'Archivo de audio normal.':'Audio-fitxategi arrunta.',
+  'Los cracks casi siempre llevan malware.':'Crackek ia beti malwarea dute.',
+  'Vídeo normal.':'Bideo arrunta.',
+  'Ejecutable desconocido de un USB.':'USB memoria bateko fitxategi exekutagarri ezezaguna.',
+  'Nivel 1 · Básico':'1. maila · Oinarrizkoa',
+  'Nivel 2 · Intermedio':'2. maila · Ertaina',
+  'Nivel 3 · Intermedio+':'3. maila · Ertain-aurreratua',
+  '🌐 Navegación web':'🌐 Web-nabigazioa',
+  '📶 WiFi':'📶 WiFi-a',
+  '💬 Mensajería':'💬 Mezularitza',
+  '🔒 HTTP vs HTTPS':'🔒 HTTP eta HTTPS',
+  '🔑 Contraseñas guardadas':'🔑 Gordetako pasahitzak',
+  '🌐 HTTP vs HTTPS':'🌐 HTTP eta HTTPS',
+  'estafa':'iruzurra',
+  'WiFi público en una cafetería':'WiFi publikoa kafetegi batean',
+  'Estás en una cafetería y necesitas revisar tu correo personal. Te has conectado a la red WiFi abierta del local, que no tiene contraseña. Cualquiera en el local podría estar conectado a la misma red. ¿Qué medidas deberías tomar?':'Kafetegi batean zaude eta zure posta pertsonala begiratu behar duzu. Lokalean pasahitzik gabeko WiFi sare ireki batera konektatu zara. Lokaleko edonor egon liteke sare berean. Zer neurri hartu beharko zenituzke?',
+  'Activar una VPN':'Aktibatu VPNa',
+  'Cifra todo el tráfico que sale de tu dispositivo hasta un servidor de confianza':'Zure gailutik konfiantzazko zerbitzari bateraino doan trafiko guztia zifratzen du',
+  'La VPN cifra todo el tráfico. Sin ella, cualquiera en la misma red puede interceptar lo que envías.':'VPNak trafiko guztia zifratzen du. Hura gabe, sare bereko edonork atzeman dezake bidaltzen duzuna.',
+  'Comprobar que las webs usan HTTPS':'Egiaztatu webguneek HTTPS erabiltzen dutela',
+  'Antes de escribir cualquier dato, asegúrate de ver el candado 🔒 en la barra':'Daturik idatzi aurretik, ziurtatu 🔒 giltzarrapoa ageri dela barran',
+  'HTTPS cifra la conexión entre tú y la web. En una red abierta, es imprescindible verificar el candado antes de meter datos.':'HTTPSek zure eta webgunearen arteko konexioa zifratzen du. Sare ireki batean, ezinbestekoa da datuak sartu aurretik giltzarrapoa egiaztatzea.',
+  'Evitar operar con datos sensibles':'Ez erabili datu sentikorrik',
+  'Deja el banco y el correo importante para cuando estés en una red de confianza':'Utzi bankuko eta posta elektronikoko kontu garrantzitsuenak konfiantzazko sare batean egon arte',
+  'Cada dato que envías por una red abierta puede ser interceptado. Mejor esperar a estar en una red de confianza.':'Sare ireki batetik bidaltzen duzun datu oro atzeman dezakete. Hobe konfiantzazko sare batean egon arte itxarotea.',
+  'Permitir compartir archivos por la red':'Baimendu sarean fitxategiak partekatzea',
+  'Deja tus carpetas visibles para cualquier dispositivo en la misma WiFi':'Utzi zure karpetak WiFi bereko edozein gailuren ikusgai',
+  'En una WiFi abierta, dejar tus carpetas visibles es un riesgo enorme. Cualquiera podría acceder a tus archivos.':'WiFi ireki batean, karpetak ikusgai uztea oso arriskutsua da. Edonor sar liteke zure fitxategietara.',
+  'Desactivar la VPN para que todo vaya más rápido':'Desaktibatu VPNa dena azkarrago joan dadin',
+  'La VPN añade latencia; sin ella, la conexión es más ágil':'VPNak latentzia gehitzen du; hura gabe konexioa arinagoa da',
+  'Desactivar la VPN por velocidad expone todo tu tráfico. La velocidad no compensa la pérdida de seguridad.':'Abiaduragatik VPNa desaktibatzeak zure trafiko guztia agerian uzten du. Abiadurak ez du segurtasun-galera konpentsatzen.',
+  'Router nuevo en casa':'Bideratzaile berria etxean',
+  'Acabas de instalar el router que te dio tu operadora. Viene con usuario "admin" y contraseña "admin" de fábrica. Quieres conectarlo todo rápido. ¿Qué deberías hacer?':'Operadoreak emandako bideratzailea instalatu berri duzu. Fabrikatik "admin" erabiltzaile-izenarekin eta "admin" pasahitzarekin dator. Dena azkar konektatu nahi duzu. Zer egin beharko zenuke?',
+  'Cambiar las credenciales por defecto del router':'Aldatu bideratzailearen lehenetsitako kredentzialak',
+  '"admin/admin" está en todas las listas de atacantes del mundo':'"admin/admin" munduko erasotzaile guztien zerrendetan dago',
+  '"admin/admin" está en todas las listas de atacantes. Cambiarla es lo primero que debes hacer.':'"admin/admin" erasotzaileen zerrenda guztietan dago. Aldatzea da egin beharreko lehen gauza.',
+  'Actualizar el firmware del router':'Eguneratu bideratzailearen firmwarea',
+  'Los parches cierran agujeros de seguridad ya conocidos':'Adabakiek jada ezagutzen diren segurtasun-zuloak ixten dituzte',
+  'Los parches cierran vulnerabilidades conocidas. Sin actualizar, tu router es una puerta abierta.':'Adabakiek ahultasun ezagunak konpontzen dituzte. Eguneratu gabe, zure bideratzailea ate irekia da.',
+  'Poner WPA3 con una contraseña fuerte al WiFi':'Ezarri WPA3 eta WiFiarentzako pasahitz sendo bat',
+  'WPA3 es el estándar más moderno de cifrado WiFi':'WPA3 WiFi zifratze-estandarrik modernoena da',
+  'WPA3 es el cifrado más moderno. WPA2 con contraseña fuerte también vale, pero WPA3 es mejor.':'WPA3 da zifratzerik modernoena. Pasahitz sendoa duen WPA2 ere egokia da, baina WPA3 hobea da.',
+  'Activar WPS para conectar los dispositivos fácilmente':'Aktibatu WPS gailuak erraz konektatzeko',
+  'Con solo pulsar un botón, los dispositivos se conectan sin escribir la clave':'Botoi bat sakatuta, gailuak konektatzen dira gakoa idatzi gabe',
+  'WPS tiene una vulnerabilidad grave conocida. Aunque sea cómodo, permite a un atacante entrar con un ataque de PIN.':'WPSek ahultasun larri eta ezagun bat du. Erosoa bada ere, erasotzaile bati PIN bidez sartzeko aukera ematen dio.',
+  'Dejar el acceso WAN del router activado':'Utzi bideratzailearen WAN sarbidea aktibatuta',
+  'Permite administrar el router desde internet':'Bideratzailea Internet bidez kudeatzeko aukera ematen du',
+  'Dejar la administración del router accesible desde internet es un riesgo enorme. Un atacante podría intentar entrar.':'Bideratzailearen kudeaketa Internetetik eskuragarri uztea oso arriskutsua da. Erasotzaile bat sartzen saia liteke.',
+  'Dispositivos inteligentes en casa':'Gailu adimendunak etxean',
+  'Tienes una cámara, un altavoz inteligente y una Smart TV conectados a la misma red WiFi que tus ordenadores. Los fabricantes de IoT suelen abandonar el firmware al año o dos. ¿Cómo los proteges?':'Kamera bat, bozgorailu adimendun bat eta Smart TV bat dituzu ordenagailuen WiFi sare berean. IoT gailuen fabrikatzaileek urtebete edo bira uzten diote firmwarea eguneratzeari. Nola babestuko dituzu?',
+  'Separarlos en una red de invitados':'Bereizi gonbidatuentzako sare batean',
+  'Si uno se compromete, no puede saltar a tus ordenadores personales':'Horietako bat arriskuan jartzen badute, ezin da zure ordenagailu pertsonaletara igaro',
+  'Aíslas los dispositivos débiles. Si uno se compromete, no puede saltar a tus ordenadores.':'Gailu ahulak isolatzen dituzu. Horietako bat arriskuan jartzen badute, ezin da zure ordenagailuetara igaro.',
+  'Cambiar sus contraseñas por defecto':'Aldatu lehenetsitako pasahitzak',
+  'Los fabricantes ponen la misma clave en todos los dispositivos del modelo':'Fabrikatzaileek modelo bereko gailu guztietan gako bera jartzen dute',
+  'Los fabricantes ponen la misma clave en todos los dispositivos del mismo modelo. Cambiarla es esencial.':'Fabrikatzaileek modelo bereko gailu guztietan gako bera jartzen dute. Ezinbestekoa da aldatzea.',
+  'Actualizar su firmware':'Eguneratu firmwarea',
+  'Cierra vulnerabilidades conocidas del fabricante':'Fabrikatzaileak ezagutzen dituen ahultasunak konpontzen ditu',
+  'Los IoT suelen tener firmware antiguo. Actualizarlo cierra agujeros conocidos.':'IoT gailuek firmware zaharkitua izaten dute. Eguneratzeak zulo ezagunak ixten ditu.',
+  'Darles una IP pública fija':'Esleitu IP publiko finko bat',
+  'Así puedes acceder a la cámara desde el móvil estés donde estés':'Horrela, kamera mugikorretik atzi dezakezu edonon zaudela ere',
+  'Dar una IP pública fija a un dispositivo IoT es exponerlo a internet. Cualquiera podría intentar acceder.':'IoT gailu bati IP publiko finko bat emateak Interneten agerian uzten du. Edonor sar liteke.',
+  'Conectarlos a la misma red que tus ordenadores':'Konektatu ordenagailuen sare berera',
+  'Así compartes archivos con la Smart TV más fácilmente':'Horrela, errazago partekatzen dituzu fitxategiak Smart TVarekin',
+  'Si un dispositivo débil se infecta, puede atacar a tus ordenadores. Mejor separarlos en otra red.':'Gailu ahul bat kutsatzen bada, zure ordenagailuei eraso diezaieke. Hobe beste sare batean bereiztea.',
+  'Correo electrónico':'Posta elektronikoa',
+  'RRHH - Tu Empresa':'Giza Baliabideak - Zure Enpresa',
+  'BBVA Seguridad':'BBVAren segurtasuna',
+  'IT Support':'Laguntza teknikoa',
+  'Equipo - Tu Empresa':'Taldea - Zure Enpresa',
+  'Javier (Contabilidad)':'Javier (Kontabilitatea)',
+  'Llamada entrante':'Sarrerako deia',
+  '"Mamá, he perdido el móvil, este es mi número nuevo. Necesito 800 € urgente para pagar una multa. No llames, estoy en una reunión."':'"Ama, mugikorra galdu dut; hau da nire zenbaki berria. 800 € behar ditut berehala isuna ordaintzeko. Ez deitu, bilera batean nago."',
+  'Patrón del "fraude del familiar": número nuevo + urgencia + dinero + "no llames".':'"Senidearen iruzurra"ren eredua: zenbaki berria + presak + dirua + "ez deitu".',
+  '"Recordatorio: la reunión del equipo se ha movido al jueves a las 10 h. Enlace en el calendario compartido."':'"Gogorarazpena: taldearen bilera osteguneko 10:00etara aldatu da. Esteka partekatutako egutegian dago."',
+  'Sin urgencia, sin petición de datos.':'Ez dago presarik eta ez da daturik eskatzen.',
+  '"Le llamo de Microsoft. Hemos detectado un virus en su ordenador. ¿Me permite acceso remoto para solucionarlo?"':'"Microsoftek deitzen dizu. Birus bat aurkitu dugu zure ordenagailuan. Urruneko sarbidea emango didazu konpontzeko?"',
+  'Microsoft NUNCA llama a usuarios domésticos para decirles que tienen un virus.':'Microsoftek EZ die inoiz etxeko erabiltzaileei deitzen birus bat dutela esateko.',
+  '"BBVA: se ha detectado un acceso no autorizado. Pulse aquí para bloquear su tarjeta: bbva-seguridad-alerta.com"':'"BBVA: baimenik gabeko sarbide bat antzeman da. Sakatu hemen txartela blokeatzeko: bbva-seguridad-alerta.com"',
+  'El dominio "bbva-seguridad-alerta.com" NO es del BBVA (real: bbva.es).':'"bbva-seguridad-alerta.com" domeinua EZ da BBVArena (benetakoa: bbva.es).',
+  '"Hola, soy tu compañero Javier de Contabilidad. Te adjunto la factura que comentamos ayer."':'"Kaixo, Javier naiz, Kontabilitateko lankidea. Atzo aipatu genuen faktura erantsi dizut."',
+  'Sin urgencia, sin petición de dinero.':'Ez dago presarik eta ez da dirurik eskatzen.',
+  '"Recordatorio: la sesión de formación de ciberseguridad del jueves sigue en pie."':'"Gogorarazpena: osteguneko zibersegurtasun-prestakuntza saioak bere horretan jarraitzen du."',
+  'Recordatorio interno, sin enlaces raros.':'Barne-gogorarazpena, esteka susmagarririk gabe.',
+  '"Le llamo de su banco. Dígame el código que acaba de recibir por SMS para cancelar un cargo sospechoso."':'"Zure bankutik deitzen dizut. Esan SMS bidez jaso berri duzun kodea, kargu susmagarri bat baliogabetzeko."',
+  'Ningún banco pide el código de verificación por teléfono. Nunca.':'Banku batek ere ez du egiaztapen-kodea telefonoz eskatzen. Inoiz ez.',
+  '"Hola, soy Laura. Te confirmo la cita del dentista para el martes a las 17:00."':'"Kaixo, Laura naiz. Astearteko 17:00etarako dentistaren hitzordua berresten dizut."',
+  'Mensaje corto, sin urgencia, sin pedir datos.':'Mezu laburra, presarik gabe eta daturik eskatu gabe.',
+  '"🎉 ¡Enhorabuena! Has ganado un iPhone 15. Solo paga 5 € de envío. Escríbeme por privado."':'"🎉 Zorionak! iPhone 15 bat irabazi duzu. 5 € ordaindu behar dituzu bidalketagatik. Idatzi mezu pribatu bat."',
+  'Los sorteos legítimos no se comunican por DM ni piden dinero.':'Legezko zozketek ez dute DM bidez jakinarazten eta ez dute dirurik eskatzen.',
+  '"Tu pedido #123-456 ha sido enviado. Podrás seguirlo desde \'Mis pedidos\'."':'"#123-456 eskaera bidali da. \'Nire eskaerak\' atalean jarrai dezakezu."',
+  'Notificación de envío normal.':'Bidalketa-jakinarazpen arrunta.',
+  'Phishing y estafas':'Phishinga eta iruzurrak',
+  'Encriptado':'Zifratzea',
+  'Contraseñas':'Pasahitzak',
+  'Ingeniería social':'Ingeniaritza soziala',
+  'Creas una contraseña segura y única':'Pasahitz sendo eta bakarra sortzen duzu',
+  'Seis minijuegos':'Sei minijoko',
+  'La contraseña está vacía.':'Pasahitza hutsik dago.',
+  'Longitud excelente':'Luzera bikaina',
+  'Longitud buena':'Luzera ona',
+  'Longitud insuficiente':'Luzera ez da nahikoa',
+  'Longitud corta':'Luzera laburra',
+  'caracteres): muy difícil de romper por fuerza bruta.':'karaktere): oso zaila da indar gordinez haustea.',
+  'caracteres).':'karaktere).',
+  'caracteres). Lo recomendable es 12–16 o más.':'karaktere). 12-16 edo gehiago izatea gomendatzen da.',
+  'caracteres). Intenta llegar a 16+.':'karaktere). Saiatu 16ra edo gehiagora iristen.',
+  'Combinas varios tipos de caracteres. Excelente variedad.':'Hainbat karaktere mota konbinatzen dituzu. Aniztasun bikaina.',
+  'Usas 3 tipos de caracteres. Bien, pero puedes añadir más variedad.':'3 karaktere mota erabiltzen dituzu. Ongi, baina aniztasun handiagoa izan dezakezu.',
+  'Solo usas ':'Karaktere mota ',
+  ' tipo(s) de caracteres. Combina mayúsculas, minúsculas, números y símbolos.':' bakarrik erabiltzen dituzu. Konbinatu letra larriak, xeheak, zenbakiak eta ikurrak.',
+  'No contiene mayúsculas.':'Ez du letra larririk.',
+  'No contiene números.':'Ez du zenbakirik.',
+  'No contiene símbolos especiales (ej. !@#$%^&*).':'Ez du ikur berezirik (adib. !@#$%^&*).',
+  'Está en las listas de contraseñas más usadas del mundo. Se rompe en segundos.':'Munduan gehien erabiltzen diren pasahitzen zerrendetan dago. Segundo gutxitan hausten da.',
+  'Evita contraseñas conocidas y reutilizadas; crea una clave única con ayuda de un gestor.':'Saihestu pasahitz ezagunak eta berrerabiliak; sortu gako bakarra pasahitz-kudeatzaile baten laguntzaz.',
+  'Contiene la palabra común ':'Hitz arrunta dauka: ',
+  ', fácil de adivinar.':', erraz asmatzen dena.',
+  'Evita palabras comunes o nombres; usa varias palabras aleatorias y no relacionadas.':'Saihestu ohiko hitzak eta izenak; erabili ausazko hainbat hitz, elkarren artean zerikusirik ez dutenak.',
+  'Contiene un año (':'Urte bat dauka (',
+  '), típico en cumpleaños y fechas.':'), urtebetetzeetan eta datetan ohikoa.',
+  'Quita años y fechas personales, que suelen ser fáciles de descubrir.':'Kendu urteak eta data pertsonalak, erraz aurki baitaitezke.',
+  'Contiene una secuencia numérica (123...). Los atacantes la prueban primero.':'Zenbaki-sekuentzia bat dauka (123...). Erasotzaileek lehenik hori probatzen dute.',
+  'Evita secuencias consecutivas de números y sustituciones previsibles.':'Saihestu elkarren segidako zenbakiak eta ordezkapen aurreikusgarriak.',
+  'Contiene una secuencia alfabética (abc...). Patrón muy predecible.':'Alfabeto-sekuentzia bat dauka (abc...). Patroi oso aurreikusgarria.',
+  'Evita secuencias alfabéticas como abc o xyz.':'Saihestu abc edo xyz moduko alfabeto-sekuentziak.',
+  'Contiene 3 o más caracteres repetidos. Reduce la entropía.':'3 karaktere edo gehiago errepikatzen ditu. Entropia murrizten du.',
+  'Evita repetir el mismo carácter varias veces seguidas.':'Saihestu karaktere bera hainbat aldiz jarraian errepikatzea.',
+  'Contiene un patrón de teclado (qwerty, asdf...). Muy predecible.':'Teklatu-patroi bat dauka (qwerty, asdf...). Oso aurreikusgarria.',
+  'No uses recorridos del teclado como qwerty o asdf.':'Ez erabili qwerty edo asdf moduko teklatu-sekuentziarik.',
+  'Longitud y variedad cumplen los estándares modernos.':'Luzerak eta aniztasunak egungo estandarrak betetzen dituzte.',
+  'Frase larga con espacios: gran entropía y fácil de recordar.':'Esaldi luzea eta zuriuneekin: entropia handia eta gogoratzeko erraza.',
+  'Amplía la longitud a 16+ caracteres.':'Luzatu pasahitza gutxienez 16 karakterera.',
+  'Añade al menos una mayúscula.':'Gehitu gutxienez letra larri bat.',
+  'Añade al menos un número.':'Gehitu gutxienez zenbaki bat.',
+  'Añade al menos un símbolo (!@#$%^&*).':'Gehitu gutxienez ikur bat (!@#$%^&*).',
+  'Combina los 4 tipos de caracteres.':'Konbinatu lau karaktere motak.',
+  'Considera una frase de 4–5 palabras con separadores.':'Pentsatu 4-5 hitzeko esaldi bat erabiltzea, bereizgailuekin.',
+  'No reutilices esta contraseña y guárdala en un gestor de contraseñas.':'Ez berrerabili pasahitz hau, eta gorde pasahitz-kudeatzaile batean.',
+  '¡Vas por buen camino! Mantén esta práctica.':'Bide onetik zoaz! Jarraitu horrela.',
+  'Excelente':'Bikaina',
+  'Muy fuerte':'Oso sendoa',
+  'Fuerte':'Sendoa',
+  'Medio':'Ertaina',
+  'Débil':'Ahula',
+  'Crítico':'Kritikoa',
+};
+
+var BASQUE_KEYS = Object.keys(BASQUE).filter(function(key){return key.length > 3;}).sort(function(a,b){return b.length-a.length;});
+var BASQUE_PATTERN = new RegExp(BASQUE_KEYS.map(function(key){
+  return key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}).join('|'), 'g');
+var originalTextNodes = new WeakMap();
+var originalAttributes = new WeakMap();
+
+function translateText(text){
+  if(currentLanguage !== 'eu' || !text) return text;
+  if(Object.prototype.hasOwnProperty.call(BASQUE, text)) return BASQUE[text];
+  return text.replace(BASQUE_PATTERN, function(source){return BASQUE[source];});
+}
+
+function translateSubtree(root){
+  if(!root) return;
+  if(root.nodeType === 3){
+    if(!originalTextNodes.has(root)) originalTextNodes.set(root, root.nodeValue);
+    var originalText = originalTextNodes.get(root);
+    var text = currentLanguage === 'eu' ? translateText(originalText) : originalText;
+    if(root.nodeValue !== text) root.nodeValue = text;
+    return;
+  }
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  var node;
+  while((node = walker.nextNode())){
+    if(!originalTextNodes.has(node)) originalTextNodes.set(node, node.nodeValue);
+    var source = originalTextNodes.get(node);
+    var translated = currentLanguage === 'eu' ? translateText(source) : source;
+    if(node.nodeValue !== translated) node.nodeValue = translated;
+  }
+  var elements = root.querySelectorAll ? root.querySelectorAll('[aria-label],[title],[placeholder]') : [];
+  for(var i=0;i<elements.length;i++){
+    ['aria-label','title','placeholder'].forEach(function(attribute){
+      if(elements[i].hasAttribute(attribute)){
+        var saved = originalAttributes.get(elements[i]) || {};
+        if(!Object.prototype.hasOwnProperty.call(saved, attribute)){
+          saved[attribute] = elements[i].getAttribute(attribute);
+          originalAttributes.set(elements[i], saved);
+        }
+        var value = saved[attribute];
+        elements[i].setAttribute(attribute, currentLanguage === 'eu' ? translateText(value) : value);
+      }
+    });
+  }
+  if(root.nodeType === 1 && root.matches && root.matches('[aria-label],[title],[placeholder]')){
+    ['aria-label','title','placeholder'].forEach(function(attribute){
+      if(root.hasAttribute(attribute)){
+        var savedRoot = originalAttributes.get(root) || {};
+        if(!Object.prototype.hasOwnProperty.call(savedRoot, attribute)){
+          savedRoot[attribute] = root.getAttribute(attribute);
+          originalAttributes.set(root, savedRoot);
+        }
+        var rootValue = savedRoot[attribute];
+        root.setAttribute(attribute, currentLanguage === 'eu' ? translateText(rootValue) : rootValue);
+      }
+    });
+  }
+}
+
+function setLanguage(language, shouldRender){
+  currentLanguage = language === 'eu' ? 'eu' : 'es';
+  document.documentElement.lang = currentLanguage;
+  document.title = currentLanguage === 'eu'
+    ? BASQUE['CiberJuegos · Aprende ciberseguridad jugando']
+    : 'CiberJuegos · Aprende ciberseguridad jugando';
+  var selector = document.getElementById('language-select');
+  if(selector) selector.value = currentLanguage;
+  try {
+    localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+  } catch(e) {
+    if(typeof toast === 'function') toast('No se pudo guardar el idioma en este navegador.', 'bad');
+  }
+  if(shouldRender !== false && typeof render === 'function' && typeof state !== 'undefined') render();
+  translateSubtree(document.body);
+}
+
+function initializeLanguage(){
+  try {
+    currentLanguage = localStorage.getItem(LANGUAGE_KEY) === 'eu' ? 'eu' : 'es';
+  } catch(e) {
+    currentLanguage = 'es';
+  }
+  document.getElementById('language-select').value = currentLanguage;
+  document.getElementById('language-select').addEventListener('change', function(event){
+    setLanguage(event.target.value);
+  });
+  setLanguage(currentLanguage, false);
+  if(window.MutationObserver){
+    var languageObserver = new MutationObserver(function(records){
+      records.forEach(function(record){
+        if(record.type === 'childList'){
+          record.addedNodes.forEach(function(added){
+            if(added.nodeType === 1 || added.nodeType === 3) translateSubtree(added);
+          });
+        } else if(record.type === 'characterData' && record.target.nodeValue){
+          if(!originalTextNodes.has(record.target)) originalTextNodes.set(record.target, record.target.nodeValue);
+          var source = originalTextNodes.get(record.target);
+          var translated = currentLanguage === 'eu' ? translateText(source) : source;
+          if(translated !== record.target.nodeValue) record.target.nodeValue = translated;
+        }
+      });
+    });
+    languageObserver.observe(document.body, { childList:true, characterData:true, subtree:true });
+  }
+}
 
 function shuffleArray(arr){
   var a = arr.slice();
@@ -2228,12 +2809,12 @@ function handleAction(action, val){
     case 'pwd-retry': handlePasswordRetry(); break;
     case 'finish-quiz-confirm':
       var pending = parseInt(val || '0', 10);
-      if(confirm('Quedan ' + pending + ' pregunta(s) sin responder. ¿Seguro que quieres finalizar? Las preguntas no respondidas contarán como fallo.')){
+      if(confirm(translateText('Quedan ' + pending + ' pregunta(s) sin responder. ¿Seguro que quieres finalizar? Las preguntas no respondidas contarán como fallo.'))){
         finishGame();
       }
       break;
     case 'reset-all':
-      if(confirm('¿Seguro que quieres borrar todo tu progreso guardado? Esta acción no se puede deshacer.')){
+      if(confirm(translateText('¿Seguro que quieres borrar todo tu progreso guardado? Esta acción no se puede deshacer.'))){
         clearPersistedState();
         state.score = 0;
         state.results = {};
@@ -2269,6 +2850,7 @@ window.addEventListener('online', function(){
 });
 
 try {
+  initializeLanguage();
   initializeApp();
 } catch (e) {
   stage.innerHTML = '<div class="boot-error" role="alert"><h1 class="title">No se pudo cargar el juego</h1>' +
