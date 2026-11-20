@@ -1183,6 +1183,16 @@ var BASQUE = {
   'Solo tu correo electrónico':'Zure helbide elektronikoa bakarrik',
   'Los servicios serios guardan un hash de tu contraseña, no la contraseña en sí.':'Zerbitzu fidagarriek pasahitzaren hash-a gordetzen dute, ez pasahitza bera.',
   'PDF normal, sin macros.':'PDF arrunta, makrorik gabe.',
+  'Factura.pdf':'Faktura.pdf',
+  'Presupuesto.pdf.exe':'Aurrekontua.pdf.exe',
+  'foto_vacaciones.jpg':'oporretako_argazkia.jpg',
+  'photoshop_gratis.exe':'photoshop_doan.exe',
+  'nomina_marzo.xlsx':'martxoko_nomina.xlsx',
+  'nomina_marzo.xlsm':'martxoko_nomina.xlsm',
+  'cancion.mp3':'abestia.mp3',
+  'crack_windows.exe':'windows_crack.exe',
+  'pelicula.mp4':'filma.mp4',
+  'usb_desconocido.exe':'usb_ezezaguna.exe',
   'Doble extensión: parece PDF pero es ejecutable.':'Luzapen bikoitza: PDFa dirudi, baina exekutagarria da.',
   'Imagen normal.':'Irudi arrunta.',
   'Software pirata. Vector de troyanos.':'Software pirata. Troiarrak edukitzeko arriskua.',
@@ -1654,6 +1664,16 @@ var ENGLISH = {
   'Solo tu correo electrónico':'Only your email address',
   'Los servicios serios guardan un hash de tu contraseña, no la contraseña en sí.':'Reputable services store a hash of your password, not the password itself.',
   'PDF normal, sin macros.':'A normal PDF with no macros.',
+  'Factura.pdf':'Invoice.pdf',
+  'Presupuesto.pdf.exe':'Estimate.pdf.exe',
+  'foto_vacaciones.jpg':'vacation_photo.jpg',
+  'photoshop_gratis.exe':'free_photoshop.exe',
+  'nomina_marzo.xlsx':'march_payroll.xlsx',
+  'nomina_marzo.xlsm':'march_payroll.xlsm',
+  'cancion.mp3':'song.mp3',
+  'crack_windows.exe':'windows_crack.exe',
+  'pelicula.mp4':'movie.mp4',
+  'usb_desconocido.exe':'unknown_usb.exe',
   'Doble extensión: parece PDF pero es ejecutable.':'Double extension: it looks like a PDF but is an executable.',
   'Imagen normal.':'A normal image.',
   'Software pirata. Vector de troyanos.':'Pirated software. A common way to spread trojans.',
@@ -2357,12 +2377,13 @@ function render(){
   stage.classList.toggle('stage-select', state.screen==='select');
   updateHUD();
   saveState();
-  if(state.screen==='lobby') return renderLobby();
-  if(state.screen==='select') return renderSelect();
-  if(state.screen==='intro') return renderIntro();
-  if(state.screen==='game') return renderGame();
-  if(state.screen==='end') return renderEnd();
-  if(state.screen==='final') return renderFinal();
+  if(state.screen==='lobby') renderLobby();
+  else if(state.screen==='select') renderSelect();
+  else if(state.screen==='intro') renderIntro();
+  else if(state.screen==='game') renderGame();
+  else if(state.screen==='end') renderEnd();
+  else if(state.screen==='final') renderFinal();
+  translateSubtree(stage);
 }
 
 function updateConnectionStatus(){
@@ -2530,7 +2551,7 @@ function renderClicker(){
         cls += ' file-item';
         var ext = getExt(it.name);
         inner = '<div class="file-icon-wrap"><span class="file-icon">'+it.icon+'</span></div>' +
-                '<div class="file-name">'+escHTML(it.name)+'</div>' +
+                '<div class="file-name">'+escHTML(translateText(it.name))+'</div>' +
                 '<div class="file-ext-badge">'+escHTML(ext)+'</div>';
       }
       return '<button class="'+cls+'" data-action="click-item" data-val="'+i+'">'+inner+'</button>';
