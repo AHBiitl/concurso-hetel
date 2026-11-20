@@ -40,10 +40,9 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .rule{display:flex;gap:12px;align-items:flex-start;background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.85rem;line-height:1.55;color:#cdd9ea}
 .rule .num{flex-shrink:0;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem;background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
 .rule:nth-child(1) .num{background:rgba(52,211,153,.12);color:var(--green);border-color:rgba(52,211,153,.3)}
-.rule:nth-child(3) .num{background:rgba(167,139,250,.12);color:var(--violet);border-color:rgba(167,139,250,.3)}
-.rule:nth-child(4) .num{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.3)}
-.rule:nth-child(5) .num{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.3)}
-.rule:nth-child(6) .num{background:rgba(34,211,238,.12);color:var(--cyan);border-color:rgba(34,211,238,.3)}
+.rule:nth-child(3) .num{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.3)}
+.rule:nth-child(4) .num{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.3)}
+.rule:nth-child(5) .num{background:rgba(34,211,238,.12);color:var(--cyan);border-color:rgba(34,211,238,.3)}
 .maxscore{background:rgba(10,20,34,.75);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:22px 0}
 .maxscore-title{font-size:.7rem;font-weight:900;letter-spacing:1.8px;color:var(--amber);text-align:center;margin-bottom:12px}
 .maxscore-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:.85rem;border-bottom:1px dashed rgba(255,255,255,.07)}
@@ -1321,10 +1320,9 @@ function renderLobby(){
     '<div class="rules">' +
       '<div class="rule"><div class="num">1</div><div>Hay <b>6 minijuegos</b>, cada uno con su propia mecánica y su propio tema.</div></div>' +
       '<div class="rule"><div class="num">2</div><div>En los juegos de <b>marcar un grupo</b>, tú decides cuándo has terminado: pulsa <b style="color:var(--amber)">Finalizar</b> cuando creas que ya has marcado todas las respuestas correctas.</div></div>' +
-      '<div class="rule"><div class="num">3</div><div>En <b>Contraseñas</b> probarás una contraseña ficticia y recibirás una puntuación local de hasta 200 pts.</div></div>' +
-      '<div class="rule"><div class="num">4</div><div>Cada respuesta correcta suma y cada fallo resta. Los puntos se van acumulando.</div></div>' +
-      '<div class="rule"><div class="num">5</div><div>Si repites un minijuego, tu puntuación anterior <b>se descuenta al empezar</b>: solo cuenta la última.</div></div>' +
-      '<div class="rule"><div class="num">6</div><div>Al completar los 6 juegos, verás tu <b>resultado final</b> con un análisis personalizado.</div></div>' +
+      '<div class="rule"><div class="num">3</div><div>Cada respuesta correcta suma y cada fallo resta. Los puntos se van acumulando.</div></div>' +
+      '<div class="rule"><div class="num">4</div><div>Si repites un minijuego, tu puntuación anterior <b>se descuenta al empezar</b>: solo cuenta la última.</div></div>' +
+      '<div class="rule"><div class="num">5</div><div>Al completar los 6 juegos, verás tu <b>resultado final</b> con un análisis personalizado.</div></div>' +
       '<div class="rule"><div class="num">💾</div><div>Tu progreso se <b>guarda automáticamente</b> en este navegador. Puedes cerrar y volver cuando quieras.</div></div>' +
     '</div>' +
     '<div class="maxscore"><div class="maxscore-title">🏆 PUNTUACIÓN MÁXIMA POSIBLE</div>' + maxRows +
@@ -1361,8 +1359,10 @@ function renderIntro(){
   var g = GAMES[state.gameIndex];
   var how = '';
   if(g.type==='clicker'){
-    var verbo = g.id==='phishing' ? 'phishing' : g.id==='malware' ? 'peligrosos' : 'estafa';
-    how = 'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son <b>'+verbo+'</b>. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa <b>Finalizar y ver resultado</b>.';
+    var verbo = g.id==='phishing' ? 'correos fraudulentos de phishing' : g.id==='malware' ? 'archivos peligrosos' : 'estafa';
+    var definicion = g.id==='phishing' ? '<br><br><b>Phishing</b> significa suplantación: un engaño que se hace pasar por una persona o entidad de confianza para robar datos.' :
+                     g.id==='malware' ? '<br><br><b>Malware</b> viene de <i>malicious software</i> y significa programa malicioso, creado para dañar un dispositivo o robar información.' : '';
+    how = 'Vas a ver una serie de elementos. Pulsa sobre todos los que creas que son <b>'+verbo+'</b>. Puedes marcar y desmarcar libremente. Cuando estés seguro de tu selección, pulsa <b>Finalizar y ver resultado</b>.'+definicion;
   } else if(g.type==='quiz'){ how = 'Lee cada pregunta con calma y elige la opción correcta entre <b>A, B o C</b>. <b>Las opciones se barajan en cada partida</b>.'; }
   else if(g.type==='password'){ how = 'Escribe una contraseña ficticia y pulsa <b>Analizar contraseña</b>. El análisis se calcula en este dispositivo: el texto no se envía al servidor ni a servicios externos. Verás una puntuación sobre 200, los puntos fuertes, los patrones previsibles y recomendaciones para mejorarla.<br><br>🔒 <b style="color:var(--amber)">No uses una contraseña real.</b> La puntuación es orientativa, no una garantía de seguridad. Puedes probar varias contraseñas ficticias; al finalizar se guardará tu <b>mejor resultado</b>.'; }
   else { how = 'Vas a ver <b>'+g.data.length+' escenarios reales</b> de dificultad creciente. En cada uno, activa los interruptores que correspondan a <b>buenas prácticas de seguridad</b> y deja desactivados los que sean <b>malas prácticas</b>.<br><br>⚠️ <b style="color:var(--amber)">¡Cuidado con las trampas!</b> Algunas opciones suenan a buena práctica (mejorar velocidad, conectar fácil) pero son <b>malas ideas de seguridad</b>.<br><br>✅ Al comprobar, <b>te explicaremos por qué cada respuesta es correcta o incorrecta</b>. <b>El orden se baraja en cada partida</b>.'; }
