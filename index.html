@@ -98,6 +98,8 @@ body{background:#03060d;color:var(--txt);font-family:system-ui,-apple-system,"Se
 .btn{display:block;width:100%;font-family:inherit;font-size:.95rem;font-weight:800;padding:15px 20px;border-radius:14px;cursor:pointer;border:1px solid;transition:.2s;letter-spacing:.3px}
 .btn-primary{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(167,139,250,.22));border-color:rgba(34,211,238,.55);color:#c8ecf7}
 .btn-primary:hover{background:linear-gradient(135deg,rgba(34,211,238,.36),rgba(167,139,250,.36));transform:translateY(-2px)}
+.btn-whatsapp{background:rgba(37,211,102,.14);border-color:rgba(37,211,102,.55);color:#c7f9d5;margin-top:14px}
+.btn-whatsapp:hover{background:rgba(37,211,102,.24);transform:translateY(-2px)}
 .btn-secondary{background:rgba(255,255,255,.03);border-color:var(--line);color:var(--muted);margin-top:10px;font-size:.85rem;padding:12px 18px}
 .btn-secondary:hover{background:rgba(255,255,255,.07);color:var(--txt)}
 .btn-finish{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.5);color:var(--amber);margin-top:14px}
@@ -1090,6 +1092,7 @@ var BASQUE = {
   'ANÁLISIS PERSONALIZADO':'AZTERKETA PERTSONALIZATUA',
   'CONSEJOS PARA TU DÍA A DÍA':'EGUNEROKO AHOLKUAK',
   'PUNTUACIÓN FINAL':'AZKEN PUNTUAZIOA',
+  'Retar a alguien por WhatsApp':'Erronka egin norbaiti WhatsApp bidez',
   'JUEGOS':'JOKOAK',
   'ACIERTOS':'ASMATUTAKOAK',
   'FALLOS':'AKATSAK',
@@ -1571,6 +1574,7 @@ var ENGLISH = {
   'ANÁLISIS PERSONALIZADO':'PERSONALIZED ANALYSIS',
   'CONSEJOS PARA TU DÍA A DÍA':'EVERYDAY TIPS',
   'PUNTUACIÓN FINAL':'FINAL SCORE',
+  'Retar a alguien por WhatsApp':'Challenge someone on WhatsApp',
   'JUEGOS':'GAMES',
   'ACIERTOS':'CORRECT',
   'FALLOS':'MISTAKES',
@@ -3237,8 +3241,15 @@ function renderFinal(){
     '<div class="breakdown-grid">'+breakdownHTML+'</div>' +
     '<div class="ai-box"><div class="ai-head"><div class="ai-ico">🤖</div> ANÁLISIS PERSONALIZADO</div><div class="ai-text">'+analysis.text+'</div></div>' +
     '<div class="tips-section"><div class="tips-head">💡 CONSEJOS PARA TU DÍA A DÍA</div>' + tipsHTML + '</div>' +
+    '<button class="btn btn-whatsapp" data-action="share-score">📲 Retar a alguien por WhatsApp</button>' +
     '<button class="btn btn-primary" style="margin-top:14px" data-action="go-lobby">🏠 Volver al inicio</button>' +
     '<button class="btn btn-secondary" data-action="go-select">🎮 Repetir minijuegos</button></div>';
+}
+
+function shareFinalScore(){
+  var shareUrl = window.location.origin + window.location.pathname;
+  var message = 'He conseguido ' + state.score + ' puntos en el reto de HETEL, ¿cuántos sacas tú? ' + shareUrl;
+  window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
 }
 
 function startGame(idx){
@@ -3313,6 +3324,7 @@ function handleAction(action, val){
     case 'go-lobby': state.screen = 'lobby'; render(); break;
     case 'go-select': state.screen = 'select'; render(); break;
     case 'go-final': state.screen = 'final'; render(); break;
+    case 'share-score': shareFinalScore(); break;
     case 'pick-game': startGame(parseInt(val,10)); break;
     case 'start-game': startCurrentGame(); break;
     case 'replay': startGame(state.gameIndex); break;
