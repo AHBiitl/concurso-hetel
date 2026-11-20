@@ -1283,6 +1283,7 @@ function getExt(name){
 }
 
 function render(){
+  stopQuizSpeech();
   stage.classList.toggle('stage-select', state.screen==='select');
   updateHUD();
   saveState();
@@ -1575,10 +1576,59 @@ function renderQuiz(){
         '<div class="quiz-card-icon">'+catIcon+'</div>' +
         '<div class="quiz-card-question">'+escHTML(q.question)+'</div>' +
       '</div>' +
+      '<button class="btn btn-primary" style="margin-top:-6px" data-action="quiz-listen" aria-pressed="false">🔊 Escuchar</button>' +
       '<div class="quiz-options">'+optsHTML+'</div>' +
       bottom +
     '</div>' +
   '</div>';
+}
+
+var quizSpeechUtterance = null;
+function stopQuizSpeech(){
+  if(!quizSpeechUtterance) return;
+  window.speechSynthesis.cancel();
+  quizSpeechUtterance = null;
+}
+function handleQuizListen(){
+  if(!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)){
+    toast('Tu navegador no admite la lectura en voz alta.', 'bad');
+    return;
+  }
+  if(quizSpeechUtterance){
+    stopQuizSpeech();
+    var stoppedButton = stage.querySelector('[data-action="quiz-listen"]');
+    if(stoppedButton){
+      stoppedButton.textContent = '🔊 Escuchar';
+      stoppedButton.setAttribute('aria-pressed', 'false');
+    }
+    return;
+  }
+
+  var q = state.quizShuffled[state.quizIndex];
+  var optionsText = q.options.map(function(option, i){
+    return String.fromCharCode(65 + i) + ': ' + option;
+  }).join('. ');
+  var utterance = new SpeechSynthesisUtterance('Pregunta: ' + q.question + '. Opciones: ' + optionsText);
+  utterance.lang = 'es-ES';
+  quizSpeechUtterance = utterance;
+  utterance.onend = utterance.onerror = function(event){
+    if(quizSpeechUtterance !== utterance) return;
+    quizSpeechUtterance = null;
+    var button = stage.querySelector('[data-action="quiz-listen"]');
+    if(button){
+      button.textContent = '🔊 Escuchar';
+      button.setAttribute('aria-pressed', 'false');
+    }
+    if(event.type === 'error' && event.error !== 'canceled' && event.error !== 'interrupted'){
+      toast('No se pudo reproducir la lectura en voz alta.', 'bad');
+    }
+  };
+  window.speechSynthesis.speak(utterance);
+  var button = stage.querySelector('[data-action="quiz-listen"]');
+  if(button){
+    button.textContent = '⏹ Detener lectura';
+    button.setAttribute('aria-pressed', 'true');
+  }
 }
 
 function handleQuizAnswer(idx){
@@ -2218,6 +2268,7 @@ function handleAction(action, val){
     case 'replay': startGame(state.gameIndex); break;
     case 'click-item': handleClickItem(parseInt(val,10)); break;
     case 'quiz-answer': handleQuizAnswer(parseInt(val,10)); break;
+    case 'quiz-listen': handleQuizListen(); break;
     case 'quiz-next': handleQuizNext(); break;
     case 'config-toggle': handleConfigToggle(parseInt(val,10)); break;
     case 'config-check': handleConfigCheck(); break;
