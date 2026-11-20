@@ -6,4 +6,4 @@ El análisis, la puntuación y las recomendaciones se calculan localmente en el 
 
 ## Idioma
 
-El selector permite usar la aplicación en castellano o euskera. Las traducciones están incluidas en la propia página: no se envía contenido a servicios externos ni se necesita una API de pago. La preferencia de idioma se guarda en el navegador, separada del progreso del juego.
+El selector permite usar la aplicación en castellano, euskera o inglés. Las traducciones están incluidas en la propia página: no se envía contenido a servicios externos ni se necesita una API de pago. La preferencia de idioma se guarda en el navegador, separada del progreso del juego.
